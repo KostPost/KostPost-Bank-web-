@@ -1,6 +1,8 @@
 package org.web.webauthorization.account;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +33,23 @@ public class AccountAction {
         return "main";
     }
 
+
+    @GetMapping("/login")
+    public String login(@AuthenticationPrincipal UserDetails user) {
+        if (user != null) {
+            // Пользователь уже аутентифицирован, перенаправляем на /main
+            return "redirect:/main";
+        }
+        // Пользователь не аутентифицирован, показываем страницу входа
+        return "login";
+    }
     @GetMapping("/signup")
-    public String showSignUp() {
+    public String signup(@AuthenticationPrincipal UserDetails user) {
+        if (user != null) {
+            // Пользователь уже аутентифицирован, перенаправляем на /main
+            return "redirect:/main";
+        }
+        // Пользователь не аутентифицирован, показываем страницу регистрации
         return "signup";
     }
     @PostMapping("/signup")
