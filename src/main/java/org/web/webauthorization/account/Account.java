@@ -1,12 +1,12 @@
 package org.web.webauthorization.account;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "accounts")
 public class Account {

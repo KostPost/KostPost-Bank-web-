@@ -1,39 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
-    <link rel="stylesheet" type="text/css" href="../static/style-main.css">
+    <!-- Используем новый CSS для страницы main -->
+    <link rel="stylesheet" href="/static/style-main.css">
 </head>
-
-<style>
-
-
-</style>
 <body>
 
-
-<a href="http://localhost:8081/main" class="bold-link" style="position: absolute">KostPost Bank</a>
-
-<div class="login-container">
-    <div class="login-form">
-        <form action="/login" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <br>
-            <input type="submit" value="Login">
-            <p th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</p>
-        </form>
-        <div class="signup-link">
-            <p>Don't have an account? <a href="/registration">Sign up</a></p>
-        </div>
+<div class="main-header">
+    <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
+    <div class="main-user-info" sec:authorize="isAuthenticated()">
+        <span sec:authentication="name">Username</span>
+        | <!-- Добавляем разделитель для визуального разграничения -->
+        <a href="/logout" class="logout-link">Logout</a>
     </div>
 </div>
-
 
 
 

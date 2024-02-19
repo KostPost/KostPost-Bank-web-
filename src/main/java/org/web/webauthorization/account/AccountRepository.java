@@ -9,6 +9,4 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
 
     Account findByAccountName(String accountName);
 
-    Account findByAccountPassword(String accountPassword);
-
 }
