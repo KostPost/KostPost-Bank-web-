@@ -3,10 +3,12 @@ package org.web.webauthorization.configurations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +33,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                         .requestMatchers("/", "/home", "/login", "/signup").permitAll()
-                        .anyRequest().permitAll() // Изменено с .authenticated() на .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/signup").permitAll() // Разрешить POST-запросы на /signup
+                        .anyRequest().authenticated() // Защита всех остальных маршрутов
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -51,10 +54,11 @@ public class WebSecurityConfig {
                                 .maximumSessions(1)
                                 .expiredUrl("/login?expired")
                         )
-                );
+                )
+                .csrf(AbstractHttpConfigurer::disable); // Отключение CSRF защиты для всего приложения
+
         return http.build();
     }
-
 
 
 

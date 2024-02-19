@@ -43,8 +43,6 @@ public class AccountAction {
 
         Account isExist = accountRepository.findByAccountName(username);
 
-        System.out.println("\n\n\n qwe \n\n\n");
-
         if(isExist == null){
             Account newAccount = new Account();
             newAccount.setAccountName(username);
@@ -52,10 +50,10 @@ public class AccountAction {
 
             accountRepository.save(newAccount);
         } else {
-            model.addAttribute("errorMessage", "Account with username " + username + "is already exist");
+            model.addAttribute("errorMessage", "Account with username " + username + " is already exist");
             return "signup";
         }
 
-        return "login";
+        return "redirect:login";
     }
 }

@@ -1,4 +1,4 @@
-package org.web.webauthorization;
+package org.web.webauthorization.configurations;
 
 
 import org.springframework.context.annotation.Configuration;
