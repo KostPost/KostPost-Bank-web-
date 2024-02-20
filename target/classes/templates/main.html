@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
+<html lang="en"  xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
     <link rel="stylesheet" href="/static/main-page.css">
-    <script defer src="/static/main-page.js"></script>
 </head>
 <body>
 
@@ -26,8 +25,26 @@
             featureContainer.style.display = 'flex'; // Показываем контейнер функций
             transferForm.style.display = 'none'; // Скрываем форму перевода
         }
+
+        // Очищаем сообщение об ошибке при смене функции
+        document.querySelector('.error-wrapper .error-message').textContent = '';
+    }
+
+    function formatCardNumber(input) {
+        let cardNumber = input.value.replace(/[^\d]/g, '').substring(0, 16);
+        cardNumber = cardNumber !== '' ? cardNumber.match(/.{1,4}/g).join(' ') : '';
+        input.value = cardNumber;
+    }
+
+    function validateForm() {
+        const errorMessage = document.querySelector('.error-wrapper .error-message');
+        if (errorMessage && errorMessage.textContent.trim() !== '') {
+            return false; // Блокируем отправку формы, если есть сообщение об ошибке
+        }
+        return true; // Разрешаем отправку формы, если ошибок нет
     }
 </script>
+
 
 <div class="main-header">
     <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
@@ -51,14 +68,19 @@
     <span id="feature-text" class="feature-text"></span>
 </div>
 
-<form id="transfer-form" action="/transfer" method="post">
+
+
+<form id="transfer-form" action="/transfer" method="post" onsubmit="return validateForm()">
     <div class="form-group">
         <label for="card-number">Номер карты:</label>
-        <input type="text" id="card-number" name="card-number">
+        <input type="text" id="card-number" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
+        <!-- Помещаем сообщение об ошибке внутрь тега <label> -->
+        <!--/*@thymesVar id="errorMessage" type=""*/-->
+        <label th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</label>
     </div>
     <div class="form-group">
         <label for="amount">Сумма:</label>
-        <input type="number" id="amount" name="amount">
+        <input type="number" id="amount" name="amount" step="any">
     </div>
     <div class="form-group">
         <label for="comment">Комментарий:</label>
@@ -66,6 +88,12 @@
     </div>
     <button type="submit" class="submit-button">Выполнить перевод</button>
 </form>
+
+
+<div class="error-wrapper">
+    <!--/*@thymesVar id="errorMessage" type=""*/-->
+    <div th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</div>
+</div>
 
 </body>
 </html>

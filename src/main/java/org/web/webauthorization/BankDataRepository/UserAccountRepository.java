@@ -1,16 +1,17 @@
 package org.web.webauthorization.BankDataRepository;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
-import org.web.webauthorization.BankData.Accounts;
 import org.web.webauthorization.BankData.UserAccount;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 @Repository
-public interface AccountRepository extends CrudRepository<Accounts, Long> {
+public interface UserAccountRepository extends CrudRepository<UserAccount, Long> {
+    UserAccount findByCardNumber(String cardNumber);
 
     UserAccount findByAccountName(String accountName);
 
-    UserAccount findByCardNumber(String cardNumber);
 
 }
