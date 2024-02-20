@@ -14,10 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.web.webauthorization.account.Account;
-import org.web.webauthorization.account.AccountRepository;
-
-import java.io.IOException;
+import org.web.webauthorization.BankData.UserAccount;
+import org.web.webauthorization.BankDataRepository.AccountRepository;
 
 
 @Configuration
@@ -64,7 +62,7 @@ public class WebSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            Account account = accountRepository.findByAccountName(username);
+            UserAccount account = accountRepository.findByAccountName(username);
             if (account == null) {
                 throw new UsernameNotFoundException("Could not find user with username: " + username);
             }

@@ -1,0 +1,65 @@
+.login-bold-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #000000;
+    font-weight: bold;
+    font-size: 24px;
+    text-decoration: none;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-form {
+    background-color: #f0f0f0;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    text-align: center;
+}
+
+.login-form p {
+    margin-bottom: 20px; /* Отступ для имени пользователя */
+    font-size: 20px; /* Увеличиваем шрифт для имени пользователя */
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"],
+.login-form input[type="submit"] {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.login-form input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.error-message,
+.signup-link a {
+    color: #007bff;
+}
+
+.error-container {
+    text-align: center;
+    color: red;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s linear;
+}
+
+.error-container.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+/*  ------------------------------------------------------------------------------------------ */

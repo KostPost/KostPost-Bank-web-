@@ -1,4 +1,4 @@
-package org.web.webauthorization.account;
+package org.web.webauthorization.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -8,19 +8,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.web.webauthorization.account.Account;
-import org.web.webauthorization.account.AccountRepository;
-
-import java.util.Objects;
+import org.web.webauthorization.BankData.UserAccount;
+import org.web.webauthorization.BankDataRepository.AccountRepository;
 
 @Controller
-public class AccountAction {
+public class AccountActionController {
 
     @Autowired
     private final AccountRepository accountRepository;
 
     @Autowired
-    public AccountAction(AccountRepository accountRepository) {
+    public AccountActionController(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
 
@@ -28,28 +26,18 @@ public class AccountAction {
     public String showIndexBank() {
         return "index";
     }
-    @GetMapping("/main")
-    public String showMainPage() {
-        return "main";
-    }
-
-
     @GetMapping("/login")
     public String login(@AuthenticationPrincipal UserDetails user) {
         if (user != null) {
-            // Пользователь уже аутентифицирован, перенаправляем на /main
             return "redirect:/main";
         }
-        // Пользователь не аутентифицирован, показываем страницу входа
         return "login";
     }
     @GetMapping("/signup")
     public String signup(@AuthenticationPrincipal UserDetails user) {
         if (user != null) {
-            // Пользователь уже аутентифицирован, перенаправляем на /main
             return "redirect:/main";
         }
-        // Пользователь не аутентифицирован, показываем страницу регистрации
         return "signup";
     }
     @PostMapping("/signup")
@@ -58,12 +46,19 @@ public class AccountAction {
             @RequestParam(name = "password") String password,
             Model model) {
 
-        Account isExist = accountRepository.findByAccountName(username);
+        UserAccount isExist = accountRepository.findByAccountName(username);
 
         if(isExist == null){
-            Account newAccount = new Account();
+            UserAccount newAccount = new UserAccount();
             newAccount.setAccountName(username);
             newAccount.setAccountPassword(password);
+
+            isExist = new UserAccount();
+            do {
+                newAccount.setCardNumber(UserAccount.generateCardNumber());
+                isExist = accountRepository.findByCardNumber(newAccount.getCardNumber());
+
+            } while (isExist != null);
 
             accountRepository.save(newAccount);
         } else {

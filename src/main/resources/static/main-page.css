@@ -1,0 +1,123 @@
+#transfer-form {
+    display: none; /* Скрыть форму перевода по умолчанию */
+    position: fixed; /* Абсолютное позиционирование относительно окна браузера */
+    top: 50%; /* Центрирование по вертикали */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translate(-50%, -50%); /* Точное центрирование */
+    width: 300px; /* Установить желаемую ширину */
+    padding: 20px; /* Отступы внутри формы */
+    box-sizing: border-box; /* Чтобы padding не влиял на общую ширину */
+    background-color: #f0f0f0; /* Серый фон */
+    border-radius: 10px; /* Скругленные углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для красивости */
+}
+
+.feature-container {
+    display: none; /* Убедитесь, что контейнер функций также изначально скрыт */
+}
+
+
+.main-header {
+    background-color: #f0f0f0;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.login-bold-link {
+    color: #000000;
+    font-weight: bold;
+    font-size: 24px;
+    text-decoration: none;
+}
+
+.main-user-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: #000000;
+    font-size: 20px;
+}
+
+.main-user-info a, .main-user-info span {
+    color: #000000;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 20px;
+}
+
+.sidebar-links {
+    position: absolute;
+    top: 100px;
+    left: 20px;
+}
+
+.sidebar-button {
+    background-color: #f0f0f0;
+    color: #000000;
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 120px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.feature-container, .feature-area {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.feature-button, .submit-button {
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.feature-area {
+    display: none; /* Изначально скрыт */
+    width: 400px; /* Увеличенная ширина для области перевода */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.submit-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

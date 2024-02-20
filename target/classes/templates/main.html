@@ -5,21 +5,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
-    <!-- Используем новый CSS для страницы main -->
-    <link rel="stylesheet" href="/static/style-main.css">
+    <link rel="stylesheet" href="/static/main-page.css">
+    <script defer src="/static/main-page.js"></script>
 </head>
 <body>
+
+<script>
+    function showFeature(featureName) {
+        const featureContainer = document.getElementById('feature-container');
+        const transferForm = document.getElementById('transfer-form');
+        const featureText = document.getElementById('feature-text');
+        const featureButton = document.getElementById('feature-button');
+
+        if (featureName === 'Перевод') {
+            transferForm.style.display = 'block'; // Показываем форму перевода
+            featureContainer.style.display = 'none'; // Скрываем контейнер функций
+        } else {
+            featureText.textContent = featureName;
+            featureButton.textContent = "Выполнить " + featureName;
+            featureContainer.style.display = 'flex'; // Показываем контейнер функций
+            transferForm.style.display = 'none'; // Скрываем форму перевода
+        }
+    }
+</script>
 
 <div class="main-header">
     <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
     <div class="main-user-info" sec:authorize="isAuthenticated()">
         <span sec:authentication="name">Username</span>
-        | <!-- Добавляем разделитель для визуального разграничения -->
+        <span sec:authorize="isAuthenticated()" class="user-balance">Balance: $1000</span>
         <a href="/logout" class="logout-link">Logout</a>
     </div>
 </div>
 
+<div class="sidebar-links">
+    <button class="sidebar-button" onclick="showFeature('Перевод')">Перевод</button>
+    <button class="sidebar-button" onclick="showFeature('Банк')">Банк</button>
+    <button class="sidebar-button" onclick="showFeature('Конвертация')">Конвертация</button>
+    <button class="sidebar-button" onclick="showFeature('Депозит')">Депозит</button>
+    <button class="sidebar-button" onclick="showFeature('История')">История</button>
+</div>
 
+<div id="feature-container" class="feature-container">
+    <button id="feature-button" class="feature-button">Функция</button>
+    <span id="feature-text" class="feature-text"></span>
+</div>
+
+<form id="transfer-form" action="/transfer" method="post">
+    <div class="form-group">
+        <label for="card-number">Номер карты:</label>
+        <input type="text" id="card-number" name="card-number">
+    </div>
+    <div class="form-group">
+        <label for="amount">Сумма:</label>
+        <input type="number" id="amount" name="amount">
+    </div>
+    <div class="form-group">
+        <label for="comment">Комментарий:</label>
+        <textarea id="comment" name="comment"></textarea>
+    </div>
+    <button type="submit" class="submit-button">Выполнить перевод</button>
+</form>
 
 </body>
 </html>
