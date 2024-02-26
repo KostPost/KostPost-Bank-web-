@@ -3,36 +3,42 @@ package org.web.webauthorization.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.web.webauthorization.BankData.Transaction;
 import org.web.webauthorization.BankData.UserAccount;
 import org.web.webauthorization.BankDataRepository.UserAccountRepository;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 
 import org.springframework.ui.Model;
+import org.web.webauthorization.Services.TransactionService;
 import org.web.webauthorization.Services.UserAccountService;
 
 @Controller
 public class MoneyController {
 
-    @Autowired
-    private UserAccountRepository userAccountRepository;
+    private final UserAccountRepository userAccountRepository;
+
+    private final UserAccountService userAccountService;
+
+    private final TransactionService transactionService;
 
     @Autowired
-    private UserAccountService userAccountService;
+    public MoneyController(UserAccountRepository userAccountRepository, TransactionService transactionService,
+                           UserAccountService userAccountService) {
+        this.userAccountRepository = userAccountRepository;
+        this.transactionService = transactionService;
+        this.userAccountService = userAccountService;
+    }
 
-//    @GetMapping("/main")
-//    public String showMainPage() {
-//        return "main";
-//    }
+
 
     @GetMapping("/main")
     public String mainPage(Model model, Authentication authentication) {
@@ -43,6 +49,15 @@ public class MoneyController {
             BigDecimal balance = userAccount.getAccountBalance();
 
             model.addAttribute("userBalance", balance);
+        }
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
+
+            // Предполагаем, что у вас есть метод в сервисе для получения списка транзакций по имени пользователя
+            List<Transaction> transactions = transactionService.findTransactionsByUsername(username);
+
+            model.addAttribute("transactions", transactions);
         }
         return "main";
     }
@@ -55,7 +70,7 @@ public class MoneyController {
 
     @PostMapping("/transfer")
     public String transfer(@RequestParam("card-number") String cardNumber,
-                           @RequestParam("amount") BigDecimal amount,
+                           @RequestParam("amount") BigDecimal TransferSum,
                            @RequestParam("comment") String comment,
                            RedirectAttributes redirectAttributes) {
 
@@ -63,7 +78,6 @@ public class MoneyController {
         String currentPrincipalName = authentication.getName();
 
         String realCardNumber = removeSpaces(cardNumber);
-        System.out.println(cardNumber);
         UserAccount userSender = userAccountRepository.findByAccountName(currentPrincipalName);
         UserAccount userRecipient = userAccountRepository.findByCardNumber(realCardNumber);
 
@@ -72,11 +86,14 @@ public class MoneyController {
         if (userRecipient == null) {
             errorMessage = "No recipient found with the provided card number.";
         }
-        if (cardNumber.length() != 19) {
+        else if(Objects.equals(userSender.getCardNumber(), cardNumber)){
+            errorMessage = "You can't send money to yourself";
+        }
+        else if (cardNumber.length() != 19) {
             errorMessage = "Card number must be exactly 19 digits long.";
-        } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+        } else if (TransferSum.compareTo(BigDecimal.ZERO) <= 0) {
             errorMessage = "Transfer amount must be positive and greater than zero.";
-        } else if (amount.compareTo(userSender.getAccountBalance()) > 0) {
+        } else if (TransferSum.compareTo(userSender.getAccountBalance()) > 0) {
             errorMessage = "Insufficient funds for this transfer.";
         }
 
@@ -86,7 +103,7 @@ public class MoneyController {
         }
 
 
-        userAccountService.updateUserAccountBalance(userSender.getId(), userRecipient.getId(), amount);
+        userAccountService.newTransfer(userSender.getId(), userRecipient.getId(), TransferSum);
 
 
 

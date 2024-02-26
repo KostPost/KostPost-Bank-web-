@@ -1,8 +1,8 @@
 package org.web.webauthorization.Services;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.web.webauthorization.BankData.Transaction;
 import org.web.webauthorization.BankData.UserAccount;
 import org.web.webauthorization.BankDataRepository.UserAccountRepository;
 
@@ -13,14 +13,16 @@ import java.util.Optional;
 public class UserAccountService {
 
     private final UserAccountRepository userAccountRepository;
+    private final TransactionService transactionService;
 
     @Autowired
-    public UserAccountService(UserAccountRepository userAccountRepository) {
+    public UserAccountService(UserAccountRepository userAccountRepository, TransactionService transactionService) {
         this.userAccountRepository = userAccountRepository;
+        this.transactionService = transactionService;
     }
 
 
-    public void updateUserAccountBalance(Long senderId, Long recipientId, BigDecimal transferSum) {
+    public void newTransfer(Long senderId, Long recipientId, BigDecimal transferSum) {
 
         Optional<UserAccount> userSenderOpt = userAccountRepository.findById(senderId);
         Optional<UserAccount> userRecipientOpt = userAccountRepository.findById(recipientId);
@@ -28,10 +30,12 @@ public class UserAccountService {
         UserAccount userSender = userSenderOpt.get();
         UserAccount userRecipient = userRecipientOpt.get();
 
+        transactionService.createNewTransfer(userSender, userRecipient, transferSum);
+
 
         userSender.setAccountBalance(userSender.getAccountBalance().subtract(transferSum));
-
         userRecipient.setAccountBalance(userRecipient.getAccountBalance().add(transferSum));
+
 
         userAccountRepository.save(userSender);
         userAccountRepository.save(userRecipient);
