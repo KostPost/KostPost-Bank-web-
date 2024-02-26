@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
@@ -45,15 +45,15 @@
     }
 </script>
 
-
 <div class="main-header">
     <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
     <div class="main-user-info" sec:authorize="isAuthenticated()">
         <span sec:authentication="name">Username</span>
-        <span sec:authorize="isAuthenticated()" class="user-balance">Balance: $1000</span>
+        <span sec:authorize="isAuthenticated()" class="user-balance"> Balance: $ <span th:text="${userBalance}"></span> </span>
         <a href="/logout" class="logout-link">Logout</a>
     </div>
 </div>
+
 
 <div class="sidebar-links">
     <button class="sidebar-button" onclick="showFeature('Перевод')">Перевод</button>

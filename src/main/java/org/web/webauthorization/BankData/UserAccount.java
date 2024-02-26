@@ -18,7 +18,7 @@ public class UserAccount extends Accounts {
     private String cardNumber;
 
     public UserAccount(){
-        this.accountBalance = BigDecimal.valueOf(1000);
+        this.accountBalance = BigDecimal.valueOf(500);
     }
 
     public static String generateCardNumber() {

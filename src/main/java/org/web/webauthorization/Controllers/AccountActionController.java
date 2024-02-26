@@ -53,7 +53,7 @@ public class AccountActionController {
             newAccount.setAccountName(username);
             newAccount.setAccountPassword(password);
 
-            isExist = new UserAccount();
+            //isExist = new UserAccount();
             do {
                 newAccount.setCardNumber(UserAccount.generateCardNumber());
                 isExist = accountRepository.findByCardNumber(newAccount.getCardNumber());

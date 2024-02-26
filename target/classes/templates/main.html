@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org"
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
@@ -45,15 +45,15 @@
     }
 </script>
 
-
 <div class="main-header">
     <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
     <div class="main-user-info" sec:authorize="isAuthenticated()">
         <span sec:authentication="name">Username</span>
-        <span sec:authorize="isAuthenticated()" class="user-balance">Balance: $1000</span>
+        <span sec:authorize="isAuthenticated()" class="user-balance"> Balance: $ <span th:text="${userBalance}"></span> </span>
         <a href="/logout" class="logout-link">Logout</a>
     </div>
 </div>
+
 
 <div class="sidebar-links">
     <button class="sidebar-button" onclick="showFeature('Перевод')">Перевод</button>
@@ -68,15 +68,10 @@
     <span id="feature-text" class="feature-text"></span>
 </div>
 
-
-
 <form id="transfer-form" action="/transfer" method="post" onsubmit="return validateForm()">
     <div class="form-group">
         <label for="card-number">Номер карты:</label>
         <input type="text" id="card-number" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
-        <!-- Помещаем сообщение об ошибке внутрь тега <label> -->
-        <!--/*@thymesVar id="errorMessage" type=""*/-->
-        <label th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</label>
     </div>
     <div class="form-group">
         <label for="amount">Сумма:</label>
@@ -88,7 +83,6 @@
     </div>
     <button type="submit" class="submit-button">Выполнить перевод</button>
 </form>
-
 
 <div class="error-wrapper">
     <!--/*@thymesVar id="errorMessage" type=""*/-->
