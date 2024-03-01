@@ -58,11 +58,20 @@ public class MainController {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
 
-            // Предполагаем, что у вас есть метод в сервисе для получения списка транзакций по имени пользователя
             List<Transaction> transactions = transactionRepository.findBySenderNameOrRecipientName(username);
-            System.out.println("\n\n\n" + transactions.size() + "\n\n\n");
+            transactions.forEach(transaction -> {
+                if(transaction.getSender().equals(username)) {
+                    transaction.setTransactionType("Sent");
 
+                    System.out.println("\n\n\n" +transaction.getTransactionType() + "\n\n\n");
+                } else if(transaction.getRecipient().equals(username)) {
+                    transaction.setTransactionType("Received");
+                    System.out.println("\n\n\n" +transaction.getTransactionType() + "\n\n\n");
+
+                }
+            });
             model.addAttribute("transactions", transactions);
+
         }
         return "main";
     }

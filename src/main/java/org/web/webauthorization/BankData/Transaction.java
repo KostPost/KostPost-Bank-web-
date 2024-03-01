@@ -41,6 +41,9 @@ public class Transaction {
     @Column(name = "recipient_balance_after_operation")
     private BigDecimal recipientBalanceAfterTransaction;
 
+    @Column(name = "transaction_type")
+    private String TransactionType;
+
     @Column(name = "account_creation_date")
     private LocalDate transactionDate = LocalDate.now();
 

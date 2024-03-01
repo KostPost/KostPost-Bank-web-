@@ -119,7 +119,7 @@
     function validateForm() {
         const errorMessage = document.querySelector('.error-wrapper .error-message');
         return !(errorMessage && errorMessage.textContent.trim() !== '');
-         // Разрешаем отправку формы, если ошибок нет
+        // Разрешаем отправку формы, если ошибок нет
     }
 </script>
 
@@ -141,16 +141,20 @@
 
 <div class="content">
     <div id="gray-rectangle" class="history">
+        <!-- This will contain the list of transactions -->
         <ul>
             <li th:each="transaction : ${transactions}"
-                th:text="'ID = ' + ${transaction.transactionID}"
                 th:data-id="${transaction.transactionID}"
-                onclick="displayTransactionDetails(this.getAttribute('data-id'))">
-                [[${transaction.transactionID}]]
+                onclick="displayTransactionDetails(this.getAttribute('data-id'))"
+                style="cursor: pointer;">
+                <span th:if="${transaction.transactionType} == 'Received'"
+                      th:text="'From: ' + ${transaction.sender} + '  +' + ${transaction.transferSum}"></span>
+                <span th:if="${transaction.transactionType} == 'Sent'"
+                      th:text="'To: ' + ${transaction.recipient} + '  -' + ${transaction.transferSum}"></span>
             </li>
         </ul>
     </div>
-    <div id="transaction-details" class="details">
+    <div id="transaction-details" class="details" style="display: flex; align-items: center; justify-content: space-evenly;">
         <!-- Transaction details will be populated here by JavaScript -->
     </div>
 </div>
