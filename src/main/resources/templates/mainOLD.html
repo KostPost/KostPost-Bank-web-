@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="/static/css/main-page.css">
+</head>
+<body>
+
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', () => {-->
+<!--        document.getElementById('gray-rectangle').addEventListener('click', (e) => {-->
+<!--            if (e.target && e.target.nodeName === "LI") {-->
+<!--                const transactionId = e.target.dataset.id;-->
+
+<!--                fetch(`/transaction-details/{transactionId}`)-->
+<!--                    .then(response => {-->
+<!--                        if (!response.ok) {-->
+<!--                            throw new Error('Network response was not ok');-->
+<!--                        }-->
+<!--                        return response.json();-->
+<!--                    })-->
+<!--                    .then(data => {-->
+<!--                        const detailsDiv = document.getElementById('transaction-details');-->
+<!--                        detailsDiv.innerHTML = `-->
+<!--                        <p>Transaction ID: ${data.transactionID}</p>-->
+<!--                        <p>Sender: ${data.sender}</p>-->
+<!--                        <p>Recipient: ${data.recipient}</p>-->
+<!--                        <p>Amount: ${data.transferSum}</p>-->
+<!--                        <p>Date: ${data.transactionDate}</p>-->
+<!--                    `;-->
+<!--                    })-->
+<!--                    .catch(error => {-->
+<!--                        console.error('Error fetching transaction details:', error);-->
+<!--                        const detailsDiv = document.getElementById('transaction-details');-->
+<!--                        detailsDiv.innerHTML = `<p>Error loading transaction details.</p>`;-->
+<!--                    });-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
+<!--    function displayTransactionDetails(transactionId) {-->
+<!--        fetch(`/transaction-details/${transactionId}`)-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => {-->
+<!--                const detailsDiv = document.getElementById('transaction-details');-->
+<!--                detailsDiv.innerHTML = `-->
+<!--                <p>Sender: ${data.sender}</p>-->
+<!--                <p>Recipient: ${data.recipient}</p>-->
+<!--                <p>Amount: ${data.transferSum}</p>-->
+<!--                <p>Date: ${data.transactionDate}</p>-->
+<!--            `;-->
+<!--            })-->
+<!--            .catch(error => console.error('Error fetching transaction details:', error));-->
+<!--    }-->
+
+<!--    let isFeatureVisible = false;-->
+<!--    function toggleFeature(featureName) {-->
+<!--        const leftGrayRectangle = document.getElementById('gray-rectangle');-->
+<!--        const rightGrayRectangle = document.getElementById('transaction-details');-->
+<!--        const featureContainer = document.getElementById('feature-container');-->
+<!--        const transferForm = document.getElementById('transfer-form');-->
+<!--        const createBankOverlay = document.getElementById('create-bank-overlay');-->
+
+<!--        // Toggle visibility state-->
+<!--        isFeatureVisible = !isFeatureVisible;-->
+
+<!--        if (isFeatureVisible) {-->
+<!--            // Hide the gray rectangles and show the feature-->
+<!--            leftGrayRectangle.style.display = 'none';-->
+<!--            rightGrayRectangle.style.display = 'none';-->
+<!--            showFeature(featureName);-->
+<!--        } else {-->
+<!--            // Show the gray rectangles and hide all features-->
+<!--            leftGrayRectangle.style.display = 'block';-->
+<!--            rightGrayRectangle.style.display = 'block';-->
+<!--            featureContainer.style.display = 'none';-->
+<!--            transferForm.style.display = 'none';-->
+<!--            createBankOverlay.style.display = 'none'; // Hide create bank overlay-->
+<!--        }-->
+<!--    }-->
+
+
+<!--    window.onload = function () {-->
+<!--        document.getElementById('gray-rectangle').style.display = 'block';-->
+<!--        document.getElementById('transaction-details').style.display = 'block';-->
+<!--        document.getElementById('feature-container').style.display = 'none';-->
+<!--        document.getElementById('transfer-form').style.display = 'none';-->
+<!--    };-->
+<!--    function showFeature(featureName) {-->
+<!--        const featureContainer = document.getElementById('feature-container');-->
+<!--        const transferForm = document.getElementById('transfer-form');-->
+<!--        const featureText = document.getElementById('feature-text');-->
+<!--        const featureButton = document.getElementById('feature-button');-->
+<!--        const createBankOverlay = document.getElementById('create-bank-overlay'); // Добавлено-->
+
+<!--        // Hide all first-->
+<!--        featureContainer.style.display = 'none';-->
+<!--        transferForm.style.display = 'none';-->
+<!--        createBankOverlay.style.display = 'none'; // Добавлено-->
+
+<!--        if (featureName === 'Перевод') {-->
+<!--            transferForm.style.display = 'block';-->
+<!--        } else if (featureName === 'Банки') {-->
+<!--            createBankOverlay.style.display = 'block'; // Добавлено-->
+<!--        } else {-->
+<!--            featureText.textContent = featureName;-->
+<!--            featureButton.textContent = "Выполнить " + featureName;-->
+<!--            featureContainer.style.display = 'flex';-->
+<!--        }-->
+
+<!--        // Clear error message on feature change-->
+<!--        document.querySelector('.error-wrapper .error-message').textContent = '';-->
+<!--    }-->
+
+
+<!--    function formatCardNumber(input) {-->
+<!--        let cardNumber = input.value.replace(/[^\d]/g, '').substring(0, 16);-->
+<!--        cardNumber = cardNumber !== '' ? cardNumber.match(/.{1,4}/g).join(' ') : '';-->
+<!--        input.value = cardNumber;-->
+<!--    }-->
+
+<!--    function validateForm() {-->
+<!--        const errorMessage = document.querySelector('.error-wrapper .error-message');-->
+<!--        return !(errorMessage && errorMessage.textContent.trim() !== '');-->
+<!--        // Разрешаем отправку формы, если ошибок нет-->
+<!--    }-->
+
+<!--    // Добавьте код для закрытия оверлея при необходимости-->
+
+<!--</script>-->
+
+<div class="main-header">
+    <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
+    <div class="main-user-info" sec:authorize="isAuthenticated()">
+        <span sec:authentication="name">Username</span>
+        <span sec:authorize="isAuthenticated()" class="user-balance"> Balance: $ <span th:text="${userBalance}"></span> </span>
+        <a href="/logout" class="logout-link">Logout</a>
+    </div>
+</div>
+
+<div class="sidebar-links">
+    <button class="sidebar-button" onclick="toggleFeature('Перевод')">Перевод</button>
+    <button class="sidebar-button" onclick="toggleFeature('Банки')">Банки</button>
+    <button class="sidebar-button" onclick="toggleFeature('Конвертация')">Конвертация</button>
+    <button class="sidebar-button" onclick="toggleFeature('Депозит')">Депозит</button>
+</div>
+
+
+<div class="content">
+    <div id="gray-rectangle" class="history">
+        <ul>
+            <li th:each="transaction : ${transactions}"
+                th:data-id="${transaction.transactionID}"
+                onclick="displayTransactionDetails(this.getAttribute('data-id'))"
+                style="cursor: pointer;">
+                <span th:if="${transaction.transactionType} == 'Received'"
+                      th:text="'From: ' + ${transaction.sender}"></span>
+                <span class="transaction-amount" th:if="${transaction.transactionType} == 'Received'"
+                      th:text="'+' + ${transaction.transferSum}"></span>
+                <span th:if="${transaction.transactionType} == 'Sent'"
+                      th:text="'To: ' + ${transaction.recipient}"></span>
+                <span class="transaction-amount" th:if="${transaction.transactionType} == 'Sent'"
+                      th:text="'-' + ${transaction.transferSum}"></span>
+            </li>
+        </ul>
+    </div>
+    <div id="transaction-details" class="details">
+        <!-- Transaction details will be populated here by JavaScript -->
+    </div>
+</div>
+
+
+
+
+<form id="banka" action="/transfer" method="post" onsubmit="return validateForm()">
+    <div class="form-group">
+        <label for="card-number">Номер карты:</label>
+        <input type="text" id="qw-number" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
+    </div>
+    <div class="form-group">
+        <label for="amount">Сумма транзакции:</label>
+        <input type="number" id="zxc" name="amount" step="any">
+    </div>
+    <div class="form-group">
+        <label for="comment">Комментарий:</label>
+        <textarea id="qwe" name="comment"></textarea>
+    </div>
+    <button type="submit" class="submit-button">Выполнить перевод</button>
+</form>
+
+
+<form id="transfer-form" action="/transfer" method="post" onsubmit="return validateForm()">
+    <div class="form-group">
+        <label for="card-number">Номер карты:</label>
+        <input type="text" id="card-number" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
+    </div>
+    <div class="form-group">
+        <label for="amount">Сумма транзакции:</label>
+        <input type="number" id="amount" name="amount" step="any">
+    </div>
+    <div class="form-group">
+        <label for="comment">Комментарий:</label>
+        <textarea id="comment" name="comment"></textarea>
+    </div>
+    <button type="submit" class="submit-button">Выполнить перевод</button>
+</form>
+
+<div class="error-wrapper">
+    <!--/*@thymesVar id="errorMessage" type=""*/-->
+    <div th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</div>
+</div>
+
+</body>
+</html>

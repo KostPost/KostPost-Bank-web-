@@ -6,122 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
     <link rel="stylesheet" href="/static/css/main-page.css">
+    <script src="/static/javaScript/main.js"></script>
+
 </head>
 <body>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('gray-rectangle').addEventListener('click', (e) => {
-            if (e.target && e.target.nodeName === "LI") {
-                const transactionId = e.target.dataset.id;
-
-                fetch(`/transaction-details/{transactionId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        const detailsDiv = document.getElementById('transaction-details');
-                        detailsDiv.innerHTML = `
-                        <p>Transaction ID: ${data.transactionID}</p>
-                        <p>Sender: ${data.sender}</p>
-                        <p>Recipient: ${data.recipient}</p>
-                        <p>Amount: ${data.transferSum}</p>
-                        <p>Date: ${data.transactionDate}</p>
-                    `;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching transaction details:', error);
-                        const detailsDiv = document.getElementById('transaction-details');
-                        detailsDiv.innerHTML = `<p>Error loading transaction details.</p>`;
-                    });
-            }
-        });
-    });
-
-    function displayTransactionDetails(transactionId) {
-        fetch(`/transaction-details/${transactionId}`)
-            .then(response => response.json())
-            .then(data => {
-                const detailsDiv = document.getElementById('transaction-details');
-                detailsDiv.innerHTML = `
-                <p>Sender: ${data.sender}</p>
-                <p>Recipient: ${data.recipient}</p>
-                <p>Amount: ${data.transferSum}</p>
-                <p>Date: ${data.transactionDate}</p>
-            `;
-            })
-            .catch(error => console.error('Error fetching transaction details:', error));
-    }
-
-
-
-
-    let isFeatureVisible = false;
-
-    function toggleFeature(featureName) {
-        const grayRectangle = document.getElementById('gray-rectangle');
-        const featureContainer = document.getElementById('feature-container');
-        const transferForm = document.getElementById('transfer-form');
-
-        // Toggle visibility state
-        isFeatureVisible = !isFeatureVisible;
-
-        if (isFeatureVisible) {
-            // Hide the gray rectangle and show the feature
-            grayRectangle.style.display = 'none';
-            showFeature(featureName);
-        } else {
-            // Show the gray rectangle and hide all features
-            grayRectangle.style.display = 'block';
-            featureContainer.style.display = 'none';
-            transferForm.style.display = 'none';
-        }
-    }
-
-    window.onload = function () {
-        // Set the initial state of the gray rectangle and feature containers
-        document.getElementById('gray-rectangle').style.display = 'block';
-        document.getElementById('feature-container').style.display = 'none';
-        document.getElementById('transfer-form').style.display = 'none';
-    };
-
-    function showFeature(featureName) {
-        const featureContainer = document.getElementById('feature-container');
-        const transferForm = document.getElementById('transfer-form');
-        const featureText = document.getElementById('feature-text');
-        const featureButton = document.getElementById('feature-button');
-
-        // Hide all first
-        featureContainer.style.display = 'none';
-        transferForm.style.display = 'none';
-
-        if (featureName === 'Перевод') {
-            transferForm.style.display = 'block';
-        } else {
-            featureText.textContent = featureName;
-            featureButton.textContent = "Выполнить " + featureName;
-            featureContainer.style.display = 'flex';
-        }
-
-        // Clear error message on feature change
-        document.querySelector('.error-wrapper .error-message').textContent = '';
-    }
-
-    function formatCardNumber(input) {
-        let cardNumber = input.value.replace(/[^\d]/g, '').substring(0, 16);
-        cardNumber = cardNumber !== '' ? cardNumber.match(/.{1,4}/g).join(' ') : '';
-        input.value = cardNumber;
-    }
-
-    function validateForm() {
-        const errorMessage = document.querySelector('.error-wrapper .error-message');
-        return !(errorMessage && errorMessage.textContent.trim() !== '');
-        // Разрешаем отправку формы, если ошибок нет
-    }
-</script>
 
 <div class="main-header">
     <a href="http://localhost:8081/main" class="login-bold-link">KostPost Bank</a>
@@ -132,61 +21,42 @@
     </div>
 </div>
 
-<div class="sidebar-links">
-    <button class="sidebar-button" onclick="toggleFeature('Перевод')">Перевод</button>
-    <button class="sidebar-button" onclick="toggleFeature('Банк')">Банк</button>
-    <button class="sidebar-button" onclick="toggleFeature('Конвертация')">Конвертация</button>
-    <button class="sidebar-button" onclick="toggleFeature('Депозит')">Депозит</button>
+
+<div class="buttons-container">
+    <button id="transfer-btn" class="custom-btn">Перевод</button>
+    <button id="banks-btn" class="custom-btn">Банки</button>
+    <button id="currency-btn" class="custom-btn">Валюты</button>
 </div>
+
 
 <div class="content">
     <div id="gray-rectangle" class="history">
-        <!-- This will contain the list of transactions -->
         <ul>
-            <li th:each="transaction : ${transactions}"
-                th:data-id="${transaction.transactionID}"
-                onclick="displayTransactionDetails(this.getAttribute('data-id'))"
-                style="cursor: pointer;">
-                <span th:if="${transaction.transactionType} == 'Received'"
-                      th:text="'From: ' + ${transaction.sender} + '  +' + ${transaction.transferSum}"></span>
+            <li th:each="transaction : ${transactions}" th:data-id="${transaction.transactionID}"
+                class="transaction-entry" style="cursor: pointer;"
+                onclick="displayTransactionDetails(this.getAttribute('data-id'))">
+
+
+                <span th:text="${transaction.transactionType == 'Received' ?
+                      'From: ' + transaction.sender :
+                      'To: ' + transaction.recipient}"></span>
+
+                <div class="transaction-amount">
                 <span th:if="${transaction.transactionType} == 'Sent'"
-                      th:text="'To: ' + ${transaction.recipient} + '  -' + ${transaction.transferSum}"></span>
+                      th:text="${transaction.transferSum}" th:style="'color:red;'"></span>
+
+                    <span th:if="${transaction.transactionType} == 'Received'"
+                          th:text="${transaction.transferSum}" th:style="'color:green;'"></span>
+
+                </div>
             </li>
         </ul>
     </div>
-    <div id="transaction-details" class="details" style="display: flex; align-items: center; justify-content: space-evenly;">
+    <div id="transaction-details" class="information">
         <!-- Transaction details will be populated here by JavaScript -->
     </div>
 </div>
 
-
-
-
-<div id="feature-container" class="feature-container">
-    <button id="feature-button" class="feature-button">Функция</button>
-    <span id="feature-text" class="feature-text"></span>
-</div>
-
-<form id="transfer-form" action="/transfer" method="post" onsubmit="return validateForm()">
-    <div class="form-group">
-        <label for="card-number">Номер карты:</label>
-        <input type="text" id="card-number" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
-    </div>
-    <div class="form-group">
-        <label for="amount">Сумма транзакции:</label>
-        <input type="number" id="amount" name="amount" step="any">
-    </div>
-    <div class="form-group">
-        <label for="comment">Комментарий:</label>
-        <textarea id="comment" name="comment"></textarea>
-    </div>
-    <button type="submit" class="submit-button">Выполнить перевод</button>
-</form>
-
-<div class="error-wrapper">
-    <!--/*@thymesVar id="errorMessage" type=""*/-->
-    <div th:if="${errorMessage}" class="error-message" style="color: red;">[[${errorMessage}]]</div>
-</div>
 
 </body>
 </html>

@@ -40,8 +40,6 @@ public class MainController {
     @GetMapping("/transaction-details/{transactionId}")
     @ResponseBody
     public Transaction getTransactionDetails(@PathVariable Long transactionId) {
-        // You would retrieve the transaction from the database using the transactionId
-        // For example:
         return transactionRepository.findById(transactionId).orElse(null);
     }
     @GetMapping("/main")
