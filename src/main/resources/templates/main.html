@@ -137,22 +137,17 @@
 <div class="content">
     <div id="gray-rectangle" class="history">
         <ul>
-            <li th:each="transaction : ${transactions}" th:data-id="${transaction.transactionID}"
+            <li th:each="transaction : ${transactions}" th:data-id="${transaction.operation_id}"
                 class="transaction-entry" style="cursor: pointer;"
                 onclick="displayTransactionDetails(this.getAttribute('data-id'))">
 
-
-                <span th:text="${transaction.transactionType == 'Received' ?
-                      'From: ' + transaction.sender :
-                      'To: ' + transaction.recipient}"></span>
+                <span th:text="${transaction.transactionType == 'Received' ? 'From: ' + transaction.sender : 'To: ' + transaction.recipient}"></span>
 
                 <div class="transaction-amount">
-                <span th:if="${transaction.transactionType} == 'Sent'"
-                      th:text="${transaction.transferSum}" th:style="'color:red;'"></span>
-
-                    <span th:if="${transaction.transactionType} == 'Received'"
-                          th:text="${transaction.transferSum}" th:style="'color:green;'"></span>
-
+        <span th:if="${transaction.transactionType == 'Sent'}"
+              th:text="${transaction.amount}" th:style="'color:red;'"></span>
+                    <span th:if="${transaction.transactionType == 'Received'}"
+                          th:text="${transaction.amount}" th:style="'color:green;'"></span>
                 </div>
             </li>
         </ul>
@@ -162,6 +157,34 @@
     </div>
 </div>
 
+
+<!--<div class="content">-->
+<!--    <div id="gray-rectangle" class="history">-->
+<!--        <ul>-->
+<!--            <li th:each="transaction : ${transactions}" th:data-id="${transaction.transactionID}"-->
+<!--                class="transaction-entry" style="cursor: pointer;"-->
+<!--                onclick="displayTransactionDetails(this.getAttribute('data-id'))">-->
+
+
+<!--                <span th:text="${transaction.transactionType == 'Received' ?-->
+<!--                      'From: ' + transaction.sender :-->
+<!--                      'To: ' + transaction.recipient}"></span>-->
+
+<!--                <div class="transaction-amount">-->
+<!--                <span th:if="${transaction.transactionType} == 'Sent'"-->
+<!--                      th:text="${transaction.transferSum}" th:style="'color:red;'"></span>-->
+
+<!--                    <span th:if="${transaction.transactionType} == 'Received'"-->
+<!--                          th:text="${transaction.transferSum}" th:style="'color:green;'"></span>-->
+
+<!--                </div>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--    <div id="transaction-details" class="information">-->
+<!--        &lt;!&ndash; Transaction details will be populated here by JavaScript &ndash;&gt;-->
+<!--    </div>-->
+<!--</div>-->
 
 </body>
 </html>

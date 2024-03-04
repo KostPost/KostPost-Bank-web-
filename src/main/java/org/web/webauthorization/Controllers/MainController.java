@@ -1,6 +1,5 @@
 package org.web.webauthorization.Controllers;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -8,8 +7,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 import org.web.webauthorization.BankData.Deposit;
+import org.web.webauthorization.BankData.FinancialOperation;
 import org.web.webauthorization.BankData.Transaction;
 import org.web.webauthorization.BankData.UserAccount;
 import org.web.webauthorization.BankDataRepository.DepositRepository;
@@ -20,28 +19,29 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import org.springframework.ui.Model;
+//import org.web.webauthorization.BankDataRepository.financialOperationRepository;
 import org.web.webauthorization.Services.UserAccountService;
 
 @Controller
 public class MainController {
 
     private final UserAccountRepository userAccountRepository;
-
     private final DepositRepository depositRepository;
-
     private final UserAccountService userAccountService;
-
     private final TransactionRepository transactionRepository;
+   // private final financialOperationRepository financialOperationRepository;
 
     UserAccount mainUser = null;
 
     @Autowired
     public MainController(UserAccountRepository userAccountRepository, TransactionRepository transactionRepository,
-                          UserAccountService userAccountService, DepositRepository depositRepository) {
+                          UserAccountService userAccountService, DepositRepository depositRepository
+                          ) {
         this.userAccountRepository = userAccountRepository;
         this.transactionRepository = transactionRepository;
         this.userAccountService = userAccountService;
         this.depositRepository = depositRepository;
+        //this.financialOperationRepository = financialOperationRepository;
     }
 
     @GetMapping("/transaction-details/{transactionId}")
@@ -49,6 +49,7 @@ public class MainController {
     public Transaction getTransactionDetails(@PathVariable Long transactionId) {
         return transactionRepository.findById(transactionId).orElse(null);
     }
+
 
     @GetMapping("/main")
     public String mainPage(Model model, Authentication authentication) {
@@ -72,22 +73,21 @@ public class MainController {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
 
+            // Adjust the method to specifically find transactions by username
             List<Transaction> transactions = transactionRepository.findBySenderNameOrRecipientName(username);
+            // Reverse the list if necessary
             Collections.reverse(transactions);
+
             transactions.forEach(transaction -> {
-                if (transaction.getSender().equals(username)) {
+                if (Objects.equals(transaction.getSender(), username)) {
                     transaction.setTransactionType("Sent");
-
-                    //System.out.println("\n\n\n" +transaction.getTransactionType() + "\n\n\n");
-                } else if (transaction.getRecipient().equals(username)) {
+                } else if (Objects.equals(transaction.getRecipient(), username)) {
                     transaction.setTransactionType("Received");
-                    //System.out.println("\n\n\n" +transaction.getTransactionType() + "\n\n\n");
-
                 }
             });
             model.addAttribute("transactions", transactions);
-
         }
+
         return "main";
     }
 

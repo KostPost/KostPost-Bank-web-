@@ -9,18 +9,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
-@Data
 @Entity
-@Table(name = "transaction")
-public class Transaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "operation_id")
-    private Long transactionID;
-
-    @Column(name = "transaction_sum")
-    private BigDecimal transferSum;
+@Data
+@DiscriminatorValue("transaction")
+public class Transaction extends FinancialOperation {
 
     @Column(name = "sender")
     private String sender;
@@ -43,8 +35,6 @@ public class Transaction {
     @Transient
     private String TransactionType;
 
-    @Column(name = "account_creation_date")
-    private LocalDate transactionDate = LocalDate.now();
 
 
 }

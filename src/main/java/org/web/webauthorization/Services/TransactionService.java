@@ -20,7 +20,7 @@ public class TransactionService {
 
         Transaction newTransaction = new Transaction();
 
-        newTransaction.setTransferSum(transferSum);
+        newTransaction.setAmount(transferSum);
 
         newTransaction.setSender(sender.getAccountName());
         newTransaction.setSenderID(sender.getId());
