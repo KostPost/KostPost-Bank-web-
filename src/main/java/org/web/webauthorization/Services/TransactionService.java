@@ -18,8 +18,6 @@ public class TransactionService {
 
     public void createNewTransfer(UserAccount sender, UserAccount recipient, BigDecimal transferSum){
 
-        Long senderID = sender.getId(), recipientID = recipient.getId();
-
         Transaction newTransaction = new Transaction();
 
         newTransaction.setTransferSum(transferSum);
@@ -34,6 +32,8 @@ public class TransactionService {
 
         newTransaction.setSenderBalanceAfterTransaction(sender.getAccountBalance().subtract(transferSum));
         newTransaction.setRecipientBalanceAfterTransaction(recipient.getAccountBalance().add(transferSum));
+
+        System.out.println("\n\n\n add tran \n\n\n");
 
         transactionRepository.save(newTransaction);
 

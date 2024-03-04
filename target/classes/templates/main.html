@@ -6,9 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main Page</title>
     <link rel="stylesheet" href="/static/css/main-page.css">
+    <link rel="stylesheet" href="/static/css/main-button.css">
     <script src="/static/javaScript/main.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
+<script>
+    $(document).ready(function(){
+        $('#transfer-form').submit(function(event){
+            event.preventDefault(); // Отменяем стандартное действие отправки формы
+
+            var formData = $(this).serialize(); // Получаем данные формы
+            $.post("/transfer", formData, function(response){
+                if(response.success) {
+                    $('#success-message').text("Транзакция успешно выполнена: " + response.message).show();
+                    $('#error-message').hide();
+                } else {
+                    $('#error-message').text("Ошибка при выполнении транзакции: " + response.message).show();
+                    $('#success-message').hide();
+                }
+            }).fail(function(xhr, status, error) {
+                $('#error-message').text("Ошибка при выполнении транзакции: " + xhr.responseText).show();
+                $('#success-message').hide();
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var createBankBtn = document.querySelector('.create-bank-btn');
+
+        createBankBtn.addEventListener('click', function() {
+            var bankName = document.getElementById("bank-name").value;
+            var bankAmount = document.getElementById("bank-amount").value;
+
+            var data = new FormData();
+            data.append('deposit-name', bankName);
+            data.append('deposit-amount', bankAmount);
+
+            fetch('/createDeposit', {
+                method: 'POST',
+                body: data
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success === "true") {
+                        //alert("Банка успешно создана!");
+                        // Можно добавить перенаправление на другую страницу, если необходимо
+                        // window.location.href = '/main';
+                    } else {
+                        alert("Ошибка: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        });
+    });
+</script>
+
 <body>
 
 
@@ -24,9 +77,61 @@
 
 <div class="buttons-container">
     <button id="transfer-btn" class="custom-btn">Перевод</button>
-    <button id="banks-btn" class="custom-btn">Банки</button>
+    <button id="banks-btn" class="custom-btn">Накопление</button>
     <button id="currency-btn" class="custom-btn">Валюты</button>
 </div>
+
+
+<div id="transfer-window" class="menu-window" style="display:none;">
+    <h2>Перевод</h2>
+    <form id="transfer-form" action="/transfer" method="post">
+        <input type="text" id="card-number" placeholder="Номер карты" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
+        <input type="number" id="amount" placeholder="Сумма" name="amount" required>
+        <textarea id="comment" placeholder="Комментарий" name="comment"></textarea>
+        <button type="submit" class="submit-btn">Перевести</button>
+    </form>
+    <!-- Блоки для сообщений об ошибках и успешных сообщениях -->
+    <div id="error-message" style="color: red; display: none;"></div>
+    <div id="success-message" style="color: green; display: none;"></div>
+</div>
+
+
+
+
+
+<div id="banks-window" class="menu-window">
+    <!-- Секция для отображения существующих банок -->
+    <div id="banks-list">
+        <h2>Список банок</h2>
+        <ul>
+            <!-- Thymeleaf цикл для отображения каждой банки -->
+            <li th:each="deposit : ${deposits}">
+                <span th:text="${deposit.depositName}">Название банки</span>
+                -
+                <span th:text="${deposit.depositSum}">Сумма</span>
+            </li>
+        </ul>
+        <button type="button" onclick="showCreateBankForm()">Создать банку</button>
+    </div>
+
+    <!-- Скрытая форма для создания банки -->
+    <div id="create-bank-section" style="display:none;">
+        <form id="create-bank-form">
+            <input type="text" id="bank-name" placeholder="Название банки">
+            <input type="number" id="bank-amount" placeholder="Сумма">
+            <button type="button" class="create-bank-btn">Создать банку</button>
+            <button type="button" class="cancel-btn" onclick="hideCreateBankForm()">Отмена</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div id="currency-window" class="menu-window" style="display:none;">Окно для валют</div>
 
 
 <div class="content">

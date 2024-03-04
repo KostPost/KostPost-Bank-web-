@@ -22,7 +22,6 @@ public class Transaction {
     @Column(name = "transaction_sum")
     private BigDecimal transferSum;
 
-
     @Column(name = "sender")
     private String sender;
     @Column(name = "sender_id")
@@ -46,5 +45,6 @@ public class Transaction {
 
     @Column(name = "account_creation_date")
     private LocalDate transactionDate = LocalDate.now();
+
 
 }

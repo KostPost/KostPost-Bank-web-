@@ -54,12 +54,13 @@
 }
 
 
+
 .content {
     display: flex;
     justify-content: space-around; /* Распределяет квадраты равномерно внутри контейнера */
     padding: 20px; /* Добавляет отступ внутри .content */
     position: absolute;
-
+    top: 150px;
 }
 .history {
     margin-left: 400px;
@@ -95,3 +96,8 @@
     overflow-y: auto; /* add scroll bar if content exceeds container's max-height */
     padding: 20px; /* Or your preferred padding */
 }
+
+
+
+
+
