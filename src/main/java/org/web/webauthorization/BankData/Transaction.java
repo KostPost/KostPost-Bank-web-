@@ -32,8 +32,14 @@ public class Transaction extends FinancialOperation {
     @Column(name = "recipient_balance_after_operation")
     private BigDecimal recipientBalanceAfterTransaction;
 
+    @Column(name = "comment")
+    private String comment;
+
+
+
+
     @Transient
-    private String TransactionType;
+    private String transactionType;
 
 
 

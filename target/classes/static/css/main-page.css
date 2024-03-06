@@ -90,7 +90,7 @@
     margin-top: 150px;
     margin-left: 100px;
     width: 300px; /* Ширина квадрата */
-    height: 230px; /* Высота квадрата */
+    height: 235px; /* Высота квадрата */
     background-color: white; /* Белый фон */
     border: 2px solid black; /* Черные края */
     overflow-y: auto; /* add scroll bar if content exceeds container's max-height */

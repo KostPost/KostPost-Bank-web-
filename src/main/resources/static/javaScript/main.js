@@ -1,3 +1,9 @@
+document.addEventListener("DOMContentLoaded", function() {
+    document.cookie.split(";").forEach(function(c) {
+        document.cookie = c.trim().split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+    });
+});
+
 function displayTransactionDetails(transactionId) {
     fetch(`/transaction-details/${transactionId}`)
         .then(response => response.json())
@@ -6,12 +12,15 @@ function displayTransactionDetails(transactionId) {
             detailsDiv.innerHTML = `
             <p>Sender: ${data.sender}</p>
             <p>Recipient: ${data.recipient}</p>
-            <p>Amount: ${data.transferSum} $</p>
-            <p>Date: ${data.transactionDate}</p>
+            <p>Amount: ${data.amount} $</p>
+            <p>Date: ${data.operationDate}</p>
+            <p>Comment: ${data.comment}</p>
+          
         `;
         })
         .catch(error => console.error('Error fetching transaction details:', error));
 }
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.custom-btn');

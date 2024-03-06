@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.web.webauthorization.BankData.Deposit;
-import org.web.webauthorization.BankData.FinancialOperation;
 import org.web.webauthorization.BankData.Transaction;
 import org.web.webauthorization.BankData.UserAccount;
 import org.web.webauthorization.BankDataRepository.DepositRepository;
@@ -73,12 +72,13 @@ public class MainController {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
 
-            // Adjust the method to specifically find transactions by username
             List<Transaction> transactions = transactionRepository.findBySenderNameOrRecipientName(username);
-            // Reverse the list if necessary
+
             Collections.reverse(transactions);
 
             transactions.forEach(transaction -> {
+
+                System.out.println(transaction.getAmount());
                 if (Objects.equals(transaction.getSender(), username)) {
                     transaction.setTransactionType("Sent");
                 } else if (Objects.equals(transaction.getRecipient(), username)) {
@@ -127,7 +127,7 @@ public class MainController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        userAccountService.newTransfer(userSender.getId(), userRecipient.getId(), transferSum);
+        userAccountService.newTransfer(userSender.getId(), userRecipient.getId(), transferSum, comment);
 
         response.put("success", "true");
         response.put("message", "Transaction successful");

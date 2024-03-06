@@ -16,9 +16,11 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    public void createNewTransfer(UserAccount sender, UserAccount recipient, BigDecimal transferSum){
+    public void createNewTransfer(UserAccount sender, UserAccount recipient, BigDecimal transferSum, String comment){
 
         Transaction newTransaction = new Transaction();
+
+        newTransaction.setComment(comment);
 
         newTransaction.setAmount(transferSum);
 

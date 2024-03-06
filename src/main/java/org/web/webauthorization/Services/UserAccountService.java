@@ -22,7 +22,7 @@ public class UserAccountService {
     }
 
 
-    public void newTransfer(Long senderId, Long recipientId, BigDecimal transferSum) {
+    public void newTransfer(Long senderId, Long recipientId, BigDecimal transferSum, String comment) {
 
         Optional<UserAccount> userSenderOpt = userAccountRepository.findById(senderId);
         Optional<UserAccount> userRecipientOpt = userAccountRepository.findById(recipientId);
@@ -30,7 +30,7 @@ public class UserAccountService {
         UserAccount userSender = userSenderOpt.get();
         UserAccount userRecipient = userRecipientOpt.get();
 
-        transactionService.createNewTransfer(userSender, userRecipient, transferSum);
+        transactionService.createNewTransfer(userSender, userRecipient, transferSum, comment);
 
 
         userSender.setAccountBalance(userSender.getAccountBalance().subtract(transferSum));
