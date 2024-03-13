@@ -1,24 +1,27 @@
 package org.web.webauthorization.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.web.webauthorization.BankData.Deposit;
-import org.web.webauthorization.BankData.Transaction;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.DepositRepository;
-import org.web.webauthorization.BankDataRepository.TransactionRepository;
-import org.web.webauthorization.BankDataRepository.UserAccountRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.web.webauthorization.BankData.FinancialOperation.*;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.DepositRepository;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.ui.Model;
 //import org.web.webauthorization.BankDataRepository.financialOperationRepository;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.FinancialOperationRepository;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.TransactionRepository;
+import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 import org.web.webauthorization.Services.UserAccountService;
 
 @Controller
@@ -28,25 +31,57 @@ public class MainController {
     private final DepositRepository depositRepository;
     private final UserAccountService userAccountService;
     private final TransactionRepository transactionRepository;
-   // private final financialOperationRepository financialOperationRepository;
+    private final FinancialOperationRepository financialOperationRepository;
 
     UserAccount mainUser = null;
 
     @Autowired
     public MainController(UserAccountRepository userAccountRepository, TransactionRepository transactionRepository,
-                          UserAccountService userAccountService, DepositRepository depositRepository
-                          ) {
+                          UserAccountService userAccountService, DepositRepository depositRepository,
+                          FinancialOperationRepository financialOperationRepository) {
         this.userAccountRepository = userAccountRepository;
         this.transactionRepository = transactionRepository;
         this.userAccountService = userAccountService;
         this.depositRepository = depositRepository;
-        //this.financialOperationRepository = financialOperationRepository;
+        this.financialOperationRepository = financialOperationRepository;
     }
 
-    @GetMapping("/transaction-details/{transactionId}")
+    @GetMapping("/operation-details/{operationId}")
     @ResponseBody
-    public Transaction getTransactionDetails(@PathVariable Long transactionId) {
-        return transactionRepository.findById(transactionId).orElse(null);
+    public FinancialOperationDTO getOperationDetails(@PathVariable Long operationId) {
+        Optional<FinancialOperation> operationOptional = financialOperationRepository.findById(operationId);
+
+        if (operationOptional.isPresent()) {
+            FinancialOperation operation = operationOptional.get();
+            FinancialOperationDTO dto = new FinancialOperationDTO();
+
+            // Populate DTO fields from the operation entity
+            dto.setOperationId(operation.getOperationId());
+            dto.setOperationDate(operation.getOperationDate());
+            dto.setAmount(operation.getAmount());
+            dto.setSenderId(operation.getSenderId());
+            dto.setRecipientId(operation.getRecipientId());
+            dto.setOperationCreatorId(operation.getOperationCreatorId());
+
+            // Determine the operation type and set additional fields based on the operation type
+            if (operation instanceof Transaction transaction) {
+                dto.setOperationType("transaction");
+                // Set Transaction-specific fields
+                dto.setSender(transaction.getSender());
+                dto.setRecipient(transaction.getRecipient());
+                dto.setComment(transaction.getComment());
+            } else if (operation instanceof DepositHistory depositHistory) {
+                dto.setOperationType("depositHistory");
+                // Set DepositHistory-specific fields
+                dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());
+                dto.setUserBalanceAfterOperation(depositHistory.getUserBalanceAfterOperation());
+            }
+            // Handle additional types as needed
+
+            return dto;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Operation not found with id: " + operationId);
+        }
     }
 
 
@@ -71,42 +106,85 @@ public class MainController {
 
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
+            UserAccount mainUser = userAccountRepository.findByAccountName(username);
+            Long userId = mainUser.getId();
 
-            List<Transaction> transactions = transactionRepository.findBySenderNameOrRecipientName(username);
+            List<FinancialOperation> operations = financialOperationRepository.findBySenderIdOrRecipientIdOrOperationCreatorId(userId, userId, userId);
+            Collections.reverse(operations);
 
-            Collections.reverse(transactions);
+            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
+            System.out.println(operations.size());
+            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
 
-            transactions.forEach(transaction -> {
+            List<FinancialOperationDTO> operationDTOs = operations.stream().map(operation -> {
+                FinancialOperationDTO dto = new FinancialOperationDTO();
 
-                System.out.println(transaction.getAmount());
-                if (Objects.equals(transaction.getSender(), username)) {
-                    transaction.setTransactionType("Sent");
-                } else if (Objects.equals(transaction.getRecipient(), username)) {
-                    transaction.setTransactionType("Received");
+                dto.setOperationId(operation.getOperationId());
+                dto.setOperationDate(operation.getOperationDate());
+                dto.setAmount(operation.getAmount());
+                dto.setSenderId(operation.getSenderId());
+                dto.setRecipientId(operation.getRecipientId());
+                dto.setOperationCreatorId(operation.getOperationCreatorId());
+
+                if (operation instanceof Transaction transaction) {
+
+                        if(Objects.equals(operation.getSenderId(), mainUser.getId())){
+                            dto.setOperationType("Send");
+                        } else {
+                            dto.setOperationType("Received");
+                        }
+                    dto.setSender(transaction.getSender());
+                    dto.setSenderBalanceBeforeTransaction(transaction.getSenderBalanceBeforeTransaction());
+                    dto.setSenderBalanceAfterTransaction(transaction.getSenderBalanceAfterTransaction());
+                    dto.setRecipient(transaction.getRecipient());
+                    dto.setRecipientBalanceBeforeTransaction(transaction.getRecipientBalanceBeforeTransaction());
+                    dto.setRecipientBalanceAfterTransaction(transaction.getRecipientBalanceAfterTransaction());
+                    dto.setComment(transaction.getComment());
+                } else if (operation instanceof DepositHistory depositHistory) {
+                    dto.setOperationType("depositHistory");
+                    dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());
+                    dto.setUserBalanceAfterOperation(depositHistory.getUserBalanceAfterOperation());
                 }
-            });
-            model.addAttribute("transactions", transactions);
-        }
+                return dto;
+            }).collect(Collectors.toList());
 
+
+
+
+            model.addAttribute("moneyHistory", operationDTOs);
+        }
         return "main";
     }
 
 
-    public static String removeSpaces(String input) {
-        return input.replaceAll("\\s+", "");
-    }
-
     @PostMapping("/transfer")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> transfer(@RequestParam("card-number") String cardNumber,
-                                                        @RequestParam("amount") BigDecimal transferSum,
-                                                        @RequestParam("comment") String comment) {
+    public ResponseEntity<Map<String, String>> transfer(
+            @RequestParam("identifier") String identifier,
+            @RequestParam("identifierType") String identifierType,
+            @RequestParam("amount") BigDecimal transferSum,
+            @RequestParam("comment") String comment) {
+
+        String cardNumber = null;
+        String recipientName = null;
+
+        if ("cardNumber".equals(identifierType)) {
+            cardNumber = identifier;
+        } else if ("username".equals(identifierType)) {
+            recipientName = identifier;
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
 
-        String realCardNumber = removeSpaces(cardNumber);
+        UserAccount userRecipient = null;
+        if (cardNumber != null) {
+            String realCardNumber = UserAccount.removeSpaces(cardNumber);
+            userRecipient = userAccountRepository.findByCardNumber(realCardNumber);
+        } else {
+            userRecipient = userAccountRepository.findByAccountName(recipientName);
+        }
         UserAccount userSender = userAccountRepository.findByAccountName(currentPrincipalName);
-        UserAccount userRecipient = userAccountRepository.findByCardNumber(realCardNumber);
 
         Map<String, String> response = new HashMap<>();
         String error = null;
@@ -133,6 +211,7 @@ public class MainController {
         response.put("message", "Transaction successful");
         return ResponseEntity.ok().body(response);
     }
+
 
     @PostMapping("/createDeposit")
     @ResponseBody

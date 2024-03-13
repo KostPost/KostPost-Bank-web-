@@ -1,10 +1,9 @@
-package org.web.webauthorization.BankDataRepository;
+package org.web.webauthorization.BankDataRepository.Accounts;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Repository;
-import org.web.webauthorization.BankData.Accounts;
-import org.web.webauthorization.BankData.UserAccount;
+import org.web.webauthorization.BankData.Accounts.Accounts;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
 
 @Repository
 public interface AccountRepository extends CrudRepository<Accounts, Long> {

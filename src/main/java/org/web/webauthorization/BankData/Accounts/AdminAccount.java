@@ -1,4 +1,4 @@
-package org.web.webauthorization.BankData;
+package org.web.webauthorization.BankData.Accounts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;

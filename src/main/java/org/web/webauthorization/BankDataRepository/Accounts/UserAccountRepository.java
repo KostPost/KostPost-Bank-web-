@@ -1,11 +1,10 @@
-package org.web.webauthorization.BankDataRepository;
+package org.web.webauthorization.BankDataRepository.Accounts;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import org.web.webauthorization.BankData.UserAccount;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
 
-import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface UserAccountRepository extends CrudRepository<UserAccount, Long> {

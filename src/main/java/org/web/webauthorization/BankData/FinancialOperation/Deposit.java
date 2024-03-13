@@ -1,4 +1,4 @@
-package org.web.webauthorization.BankData;
+package org.web.webauthorization.BankData.FinancialOperation;
 
 import jakarta.persistence.*;
 import lombok.Data;

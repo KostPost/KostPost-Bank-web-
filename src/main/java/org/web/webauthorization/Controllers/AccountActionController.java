@@ -8,8 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.AccountRepository;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.Accounts.AccountRepository;
 
 @Controller
 public class AccountActionController {

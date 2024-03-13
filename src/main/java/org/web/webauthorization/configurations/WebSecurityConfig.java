@@ -14,8 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.AccountRepository;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.Accounts.AccountRepository;
 
 
 @Configuration

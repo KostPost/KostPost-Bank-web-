@@ -1,8 +1,10 @@
-package org.web.webauthorization.BankData;
+package org.web.webauthorization.BankData.Accounts;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+
+import java.util.UUID;
 
 @Entity
 @Data

@@ -2,12 +2,12 @@ package org.web.webauthorization.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web.webauthorization.BankData.Transaction;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.UserAccountRepository;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserAccountService {

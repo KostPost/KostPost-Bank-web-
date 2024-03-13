@@ -11,29 +11,31 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <script>
-    $(document).ready(function(){
-        $('#transfer-form').submit(function(event){
+    $(document).ready(function () {
+        $('#transfer-form').submit(function (event) {
             event.preventDefault(); // Отменяем стандартное действие отправки формы
 
             var formData = $(this).serialize(); // Получаем данные формы
-            $.post("/transfer", formData, function(response){
-                if(response.success) {
+            $.post("/transfer", formData, function (response) {
+                if (response.success) {
                     $('#success-message').text("Транзакция успешно выполнена: " + response.message).show();
                     $('#error-message').hide();
                 } else {
                     $('#error-message').text("Ошибка при выполнении транзакции: " + response.message).show();
                     $('#success-message').hide();
                 }
-            }).fail(function(xhr, status, error) {
+            }).fail(function (xhr, status, error) {
                 $('#error-message').text("Ошибка при выполнении транзакции: " + xhr.responseText).show();
                 $('#success-message').hide();
             });
         });
     });
-    document.addEventListener('DOMContentLoaded', function() {
+
+
+    document.addEventListener('DOMContentLoaded', function () {
         var createBankBtn = document.querySelector('.create-bank-btn');
 
-        createBankBtn.addEventListener('click', function() {
+        createBankBtn.addEventListener('click', function () {
             var bankName = document.getElementById("bank-name").value;
             var bankAmount = document.getElementById("bank-amount").value;
 
@@ -85,7 +87,17 @@
 <div id="transfer-window" class="menu-window" style="display:none;">
     <h2>Перевод</h2>
     <form id="transfer-form" action="/transfer" method="post">
-        <input type="text" id="card-number" placeholder="Номер карты" name="card-number" maxlength="19" oninput="formatCardNumber(this)">
+        <!-- Раздел для выбора типа идентификатора -->
+        <div>
+            <input type="radio" id="card" name="identifierType" value="cardNumber" checked
+                   onchange="updateInputField()">
+            <label for="card">Номер карты</label>
+            <input type="radio" id="username" name="identifierType" value="username" onchange="updateInputField()">
+            <label for="username">Имя пользователя</label>
+        </div>
+        <!-- Поле для ввода номера карты/имени пользователя -->
+        <input type="text" id="identifier" placeholder="Номер карты" name="identifier" maxlength="19"
+               oninput="formatCardNumber(this)">
         <input type="number" id="amount" placeholder="Сумма" name="amount" required>
         <textarea id="comment" placeholder="Комментарий" name="comment"></textarea>
         <button type="submit" class="submit-btn">Перевести</button>
@@ -94,9 +106,6 @@
     <div id="error-message" style="color: red; display: none;"></div>
     <div id="success-message" style="color: green; display: none;"></div>
 </div>
-
-
-
 
 
 <div id="banks-window" class="menu-window">
@@ -126,65 +135,38 @@
 </div>
 
 
-
-
-
-
-
 <div id="currency-window" class="menu-window" style="display:none;">Окно для валют</div>
 
 
-<div class="content">
+    <div class="content">
     <div id="gray-rectangle" class="history">
         <ul>
-            <li th:each="transaction : ${transactions}" th:data-id="${transaction.operation_id}"
-                class="transaction-entry" style="cursor: pointer;"
-                onclick="displayTransactionDetails(this.getAttribute('data-id'))">
+            <li th:each="operation : ${moneyHistory}" th:data-id="${operation.operationId}" class="operation-entry"
+                style="cursor: pointer;" onclick="displayOperationDetails(this.getAttribute('data-id'))">
+                <!-- Display for sent transactions -->
+                <span th:if="${operation.operationType == 'Send'}" th:text="'To: ' + ${operation.recipient} + ' | Amount: ' + ${operation.amount}"></span>
 
-                <span th:text="${transaction.transactionType == 'Received' ? 'From: ' + transaction.sender : 'To: ' + transaction.recipient}"></span>
+                <!-- Display for received transactions -->
+                <span th:if="${operation.operationType == 'Received'}" th:text="'From: ' + ${operation.sender} + ' | Amount: ' + ${operation.amount}"></span>
 
-                <div class="transaction-amount">
-        <span th:if="${transaction.transactionType == 'Sent'}"
-              th:text="${transaction.amount}" th:style="'color:red;'"></span>
-                    <span th:if="${transaction.transactionType == 'Received'}"
-                          th:text="${transaction.amount}" th:style="'color:green;'"></span>
+                <!-- Display for deposit operations -->
+                <span th:if="${operation.operationType == 'depositHistory'}" th:text="'Deposit to Account | Amount: ' + ${operation.amount}"></span>
+
+                <!-- Color coding for transaction amount -->
+                <div th:style="${operation.operationType == 'Send'} ? 'color:red;' : 'color:green;'">
+                    <!-- This div will automatically inherit the color style from above based on the operation type -->
+                    <span th:text="${operation.amount}"></span>
                 </div>
             </li>
         </ul>
     </div>
-    <div id="transaction-details" class="information">
-        <!-- Transaction details will be populated here by JavaScript -->
+    <div id="operation-details" class="information">
+        <!-- Operation details will be populated here by JavaScript -->
     </div>
 </div>
 
 
-<!--<div class="content">-->
-<!--    <div id="gray-rectangle" class="history">-->
-<!--        <ul>-->
-<!--            <li th:each="transaction : ${transactions}" th:data-id="${transaction.transactionID}"-->
-<!--                class="transaction-entry" style="cursor: pointer;"-->
-<!--                onclick="displayTransactionDetails(this.getAttribute('data-id'))">-->
 
-
-<!--                <span th:text="${transaction.transactionType == 'Received' ?-->
-<!--                      'From: ' + transaction.sender :-->
-<!--                      'To: ' + transaction.recipient}"></span>-->
-
-<!--                <div class="transaction-amount">-->
-<!--                <span th:if="${transaction.transactionType} == 'Sent'"-->
-<!--                      th:text="${transaction.transferSum}" th:style="'color:red;'"></span>-->
-
-<!--                    <span th:if="${transaction.transactionType} == 'Received'"-->
-<!--                          th:text="${transaction.transferSum}" th:style="'color:green;'"></span>-->
-
-<!--                </div>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--    </div>-->
-<!--    <div id="transaction-details" class="information">-->
-<!--        &lt;!&ndash; Transaction details will be populated here by JavaScript &ndash;&gt;-->
-<!--    </div>-->
-<!--</div>-->
 
 </body>
 </html>

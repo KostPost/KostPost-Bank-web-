@@ -1,12 +1,11 @@
 package org.web.webauthorization.Services;
 
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web.webauthorization.BankData.Deposit;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.DepositRepository;
-import org.web.webauthorization.BankDataRepository.UserAccountRepository;
+import org.web.webauthorization.BankData.FinancialOperation.Deposit;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.DepositRepository;
+import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 
 @Service
 public class DepositService {

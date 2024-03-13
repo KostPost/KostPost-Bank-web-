@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.web.webauthorization.BankData.Transaction;
-import org.web.webauthorization.BankData.UserAccount;
-import org.web.webauthorization.BankDataRepository.TransactionRepository;
+import org.web.webauthorization.BankData.FinancialOperation.Transaction;
+import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.TransactionRepository;
 
 @Service
 @Data
@@ -20,16 +20,18 @@ public class TransactionService {
 
         Transaction newTransaction = new Transaction();
 
+        newTransaction.setSenderId(sender.getId());
+
         newTransaction.setComment(comment);
 
         newTransaction.setAmount(transferSum);
 
         newTransaction.setSender(sender.getAccountName());
-        newTransaction.setSenderID(sender.getId());
+        newTransaction.setSenderId(sender.getId());
         newTransaction.setSenderBalanceBeforeTransaction(sender.getAccountBalance());
 
         newTransaction.setRecipient(recipient.getAccountName());
-        newTransaction.setRecipientID(recipient.getId());
+        newTransaction.setRecipientId(recipient.getId());
         newTransaction.setRecipientBalanceBeforeTransaction(recipient.getAccountBalance());
 
         newTransaction.setSenderBalanceAfterTransaction(sender.getAccountBalance().subtract(transferSum));
