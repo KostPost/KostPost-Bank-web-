@@ -1,12 +1,14 @@
 package org.web.webauthorization.BankData.FinancialOperation;
 
+import jakarta.persistence.Transient;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class FinancialOperationDTO {
+public class FinancialOperationDTO extends FinancialOperation{
 
     private Long operationId;
     private LocalDate operationDate;
@@ -14,7 +16,6 @@ public class FinancialOperationDTO {
     private Long senderId;
     private Long recipientId;
     private Long operationCreatorId;
-    private String operationType;
 
     // DepositHistory specific fields
     private BigDecimal userBalanceBeforeOperation;
@@ -28,6 +29,6 @@ public class FinancialOperationDTO {
     private BigDecimal recipientBalanceBeforeTransaction;
     private BigDecimal recipientBalanceAfterTransaction;
     private String comment;
-    
+
 
 }

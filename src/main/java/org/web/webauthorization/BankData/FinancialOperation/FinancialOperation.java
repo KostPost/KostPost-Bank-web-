@@ -2,6 +2,7 @@ package org.web.webauthorization.BankData.FinancialOperation;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,11 +28,35 @@ public abstract class FinancialOperation {
 
     @Column(name = "recipient_id")
     private Long recipientId;
-    
+
     @Column(name = "operation_creator_id")
     private Long operationCreatorId;
 
-//    @Transient
-//    public String operationType;
+    @Transient
+    public DepositActions depositActions;
+    @Getter
+    public enum DepositActions {
+        WITHDRAW("Withdraw"),
+        DEPOSIT("Deposit");
+
+        private final String description;
+        DepositActions(String description) {
+            this.description = description;
+        }
+    }
+
+    @Transient
+    public TransactionType transactionType;
+    @Getter
+    public enum TransactionType {
+        SEND("Send"),
+        RECEIVED("Received");
+        private final String description;
+        TransactionType(String description) {
+            this.description = description;
+        }
+
+    }
+
 
 }

@@ -21,7 +21,10 @@ public class Deposit {
     @Column(name = "deposit_name")
     private String depositName;
 
-    @Column(name = "deposit_sum")
-    private BigDecimal depositSum;
+    @Column(name = "deposit_current_sum")
+    private BigDecimal depositCurrentSum;
+
+    @Column(name = "deposit_goal_sum")
+    private BigDecimal depositGoalSum;
 
 }

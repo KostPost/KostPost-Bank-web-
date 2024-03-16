@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 
 @Entity
@@ -30,4 +31,6 @@ public class Transaction extends FinancialOperation {
 
     @Column(name = "comment")
     private String comment;
+
+
 }

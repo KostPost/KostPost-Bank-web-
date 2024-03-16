@@ -24,6 +24,8 @@ import org.web.webauthorization.BankDataRepository.FinancialOperation.Transactio
 import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 import org.web.webauthorization.Services.UserAccountService;
 
+import static org.web.webauthorization.BankData.FinancialOperation.FinancialOperation.DepositActions.WITHDRAW;
+
 @Controller
 public class MainController {
 
@@ -48,8 +50,13 @@ public class MainController {
 
     @GetMapping("/operation-details/{operationId}")
     @ResponseBody
-    public FinancialOperationDTO getOperationDetails(@PathVariable Long operationId) {
+    public FinancialOperationDTO getOperationDetails(@PathVariable Long operationId, Authentication authentication) {
         Optional<FinancialOperation> operationOptional = financialOperationRepository.findById(operationId);
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
+            mainUser = userAccountRepository.findByAccountName(username);
+        }
 
         if (operationOptional.isPresent()) {
             FinancialOperation operation = operationOptional.get();
@@ -63,15 +70,24 @@ public class MainController {
             dto.setRecipientId(operation.getRecipientId());
             dto.setOperationCreatorId(operation.getOperationCreatorId());
 
-            // Determine the operation type and set additional fields based on the operation type
             if (operation instanceof Transaction transaction) {
-                dto.setOperationType("transaction");
-                // Set Transaction-specific fields
+
+                if (Objects.equals(operation.getSenderId(), mainUser.getId())) {
+                    dto.setTransactionType(FinancialOperationDTO.TransactionType.SEND);
+                } else {
+                    dto.setTransactionType(FinancialOperationDTO.TransactionType.RECEIVED);
+                }
+
                 dto.setSender(transaction.getSender());
                 dto.setRecipient(transaction.getRecipient());
                 dto.setComment(transaction.getComment());
-            } else if (operation instanceof DepositHistory depositHistory) {
-                dto.setOperationType("depositHistory");
+            } else if (operation instanceof DepositActions depositHistory) {
+
+                if (operation.getDepositActions() == WITHDRAW) {
+                    dto.setDepositActions(FinancialOperation.DepositActions.WITHDRAW);
+                } else {
+                    dto.setDepositActions(FinancialOperation.DepositActions.DEPOSIT);
+                }
                 // Set DepositHistory-specific fields
                 dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());
                 dto.setUserBalanceAfterOperation(depositHistory.getUserBalanceAfterOperation());
@@ -80,7 +96,7 @@ public class MainController {
 
             return dto;
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Operation not found with id: " + operationId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, STR."Operation not found with id: \{operationId}");
         }
     }
 
@@ -112,9 +128,9 @@ public class MainController {
             List<FinancialOperation> operations = financialOperationRepository.findBySenderIdOrRecipientIdOrOperationCreatorId(userId, userId, userId);
             Collections.reverse(operations);
 
-            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
-            System.out.println(operations.size());
-            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
+//            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
+//            System.out.println(operations.size());
+//            System.out.println("\n\n\n ------------------------------------------------------------------------------------------");
 
             List<FinancialOperationDTO> operationDTOs = operations.stream().map(operation -> {
                 FinancialOperationDTO dto = new FinancialOperationDTO();
@@ -128,11 +144,11 @@ public class MainController {
 
                 if (operation instanceof Transaction transaction) {
 
-                        if(Objects.equals(operation.getSenderId(), mainUser.getId())){
-                            dto.setOperationType("Send");
-                        } else {
-                            dto.setOperationType("Received");
-                        }
+                    if (Objects.equals(operation.getSenderId(), mainUser.getId())) {
+                        dto.setTransactionType(FinancialOperationDTO.TransactionType.SEND);
+                    } else {
+                        dto.setTransactionType(FinancialOperationDTO.TransactionType.RECEIVED);
+                    }
                     dto.setSender(transaction.getSender());
                     dto.setSenderBalanceBeforeTransaction(transaction.getSenderBalanceBeforeTransaction());
                     dto.setSenderBalanceAfterTransaction(transaction.getSenderBalanceAfterTransaction());
@@ -140,15 +156,18 @@ public class MainController {
                     dto.setRecipientBalanceBeforeTransaction(transaction.getRecipientBalanceBeforeTransaction());
                     dto.setRecipientBalanceAfterTransaction(transaction.getRecipientBalanceAfterTransaction());
                     dto.setComment(transaction.getComment());
-                } else if (operation instanceof DepositHistory depositHistory) {
-                    dto.setOperationType("depositHistory");
+                } else if (operation instanceof DepositActions depositHistory) {
+
+                    if (operation.getDepositActions() == WITHDRAW) {
+                        dto.setDepositActions(FinancialOperation.DepositActions.WITHDRAW);
+                    } else {
+                        dto.setDepositActions(FinancialOperation.DepositActions.DEPOSIT);
+                    }
                     dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());
                     dto.setUserBalanceAfterOperation(depositHistory.getUserBalanceAfterOperation());
                 }
                 return dto;
             }).collect(Collectors.toList());
-
-
 
 
             model.addAttribute("moneyHistory", operationDTOs);
@@ -224,20 +243,19 @@ public class MainController {
         if (depositSum.compareTo(BigDecimal.ZERO) < 0) {
             error = "deposit sum can't be less than 0";
         }
-
-
-        Deposit deposit = new Deposit();
-        deposit.setDepositName(depositName);
-        deposit.setDepositSum(depositSum);
-        deposit.setOwnerID(mainUser.getId());
-
         if (error != null) {
             response.put("success", "false");
             response.put("message", error);
             return ResponseEntity.badRequest().body(response);
         }
 
-        System.out.println(deposit.getDepositID() + "\n" + deposit.getOwnerID() + "\n" + deposit.getDepositSum() + "\n" + deposit.getDepositName());
+        Deposit deposit = new Deposit();
+        deposit.setDepositName(depositName);
+        deposit.setDepositGoalSum(depositSum);
+        deposit.setOwnerID(mainUser.getId());
+
+
+        System.out.println(STR."\{deposit.getDepositID()}\n\{deposit.getOwnerID()}\n\{deposit.getDepositGoalSum()}\n\{deposit.getDepositName()}");
 
         depositRepository.save(deposit);
 

@@ -117,7 +117,7 @@
             <li th:each="deposit : ${deposits}">
                 <span th:text="${deposit.depositName}">Название банки</span>
                 -
-                <span th:text="${deposit.depositSum}">Сумма</span>
+                <span th:text="${deposit.depositGoalSum}">Сумма</span>
             </li>
         </ul>
         <button type="button" onclick="showCreateBankForm()">Создать банку</button>
@@ -138,25 +138,33 @@
 <div id="currency-window" class="menu-window" style="display:none;">Окно для валют</div>
 
 
-    <div class="content">
+<div class="content">
     <div id="gray-rectangle" class="history">
         <ul>
             <li th:each="operation : ${moneyHistory}" th:data-id="${operation.operationId}" class="operation-entry"
                 style="cursor: pointer;" onclick="displayOperationDetails(this.getAttribute('data-id'))">
-                <!-- Display for sent transactions -->
-                <span th:if="${operation.operationType == 'Send'}" th:text="'To: ' + ${operation.recipient} + ' | Amount: ' + ${operation.amount}"></span>
 
-                <!-- Display for received transactions -->
-                <span th:if="${operation.operationType == 'Received'}" th:text="'From: ' + ${operation.sender} + ' | Amount: ' + ${operation.amount}"></span>
 
-                <!-- Display for deposit operations -->
-                <span th:if="${operation.operationType == 'depositHistory'}" th:text="'Deposit to Account | Amount: ' + ${operation.amount}"></span>
+                <!-- Handling SEND operation -->
+                <span th:if="${operation.transactionType != null and operation.transactionType.name() == 'SEND'}">
+                    <span th:text="'To: ' + ${operation.recipient} + ' | Amount: '"></span>
+                    <span th:text="${operation.amount}" style="color: red;"></span>
+                </span>
 
-                <!-- Color coding for transaction amount -->
-                <div th:style="${operation.operationType == 'Send'} ? 'color:red;' : 'color:green;'">
-                    <!-- This div will automatically inherit the color style from above based on the operation type -->
-                    <span th:text="${operation.amount}"></span>
-                </div>
+                <!-- Handling RECEIVED operation -->
+                <span th:if="${operation.transactionType != null and operation.transactionType.name() == 'RECEIVED'}">
+                    <span th:text="'From: ' + ${operation.sender} + ' | Amount: '"></span>
+                    <span th:text="${operation.amount}" style="color: green;"></span>
+                </span>
+
+                <span th:if="${operation.depositActions != null and operation.depositActions.name() == 'WITHDRAW'}"
+                      th:text="'Withdraw | Amount: ' + ${operation.amount}" style="color: orange;">
+                </span>
+
+                <!-- Handling DEPOSIT operation -->
+                <span th:if="${operation.depositActions != null and operation.depositActions.name() == 'DEPOSIT'}"
+                      th:text="'Deposit | Amount: ' + ${operation.amount}" style="color: blue;">
+                </span>
             </li>
         </ul>
     </div>
@@ -164,8 +172,6 @@
         <!-- Operation details will be populated here by JavaScript -->
     </div>
 </div>
-
-
 
 
 </body>

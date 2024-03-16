@@ -2,18 +2,23 @@ package org.web.webauthorization.BankData.FinancialOperation;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.web.webauthorization.BankData.FinancialOperation.FinancialOperation;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
-@Data
+@Getter
+@Setter
 @DiscriminatorValue("deposit_history")
-public class DepositHistory extends FinancialOperation {
-
+public class DepositActions extends FinancialOperation {
 
     private BigDecimal userBalanceBeforeOperation;
     private BigDecimal userBalanceAfterOperation;
+
+    @Override
+    public boolean canEqual(Object other) {
+        return other instanceof DepositActions;
+    }
 
 }
