@@ -54,7 +54,6 @@
 }
 
 
-
 .content {
     display: flex;
     justify-content: space-around; /* Распределяет квадраты равномерно внутри контейнера */

@@ -37,7 +37,7 @@ public class TransactionService {
         newTransaction.setSenderBalanceAfterTransaction(sender.getAccountBalance().subtract(transferSum));
         newTransaction.setRecipientBalanceAfterTransaction(recipient.getAccountBalance().add(transferSum));
 
-        System.out.println("\n\n\n add tran \n\n\n");
+        System.out.println(STR."\n\n\n\{newTransaction.getSenderBalanceBeforeTransaction()}\t\{newTransaction.getSenderBalanceAfterTransaction()}\n\n\n");
 
         transactionRepository.save(newTransaction);
 

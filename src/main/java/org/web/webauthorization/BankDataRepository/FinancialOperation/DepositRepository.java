@@ -12,4 +12,5 @@ public interface DepositRepository extends JpaRepository<Deposit, Long> {
     ArrayList<Deposit> findByOwnerID(Long id);
 
 
+
 }

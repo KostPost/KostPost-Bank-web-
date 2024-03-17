@@ -22,9 +22,9 @@ public class Deposit {
     private String depositName;
 
     @Column(name = "deposit_current_sum")
-    private BigDecimal depositCurrentSum;
+    private BigDecimal depositCurrentAmount =  BigDecimal.valueOf(100);
 
     @Column(name = "deposit_goal_sum")
-    private BigDecimal depositGoalSum;
+    private BigDecimal depositGoalAmount;
 
 }

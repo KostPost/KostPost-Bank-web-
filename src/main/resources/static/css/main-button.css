@@ -67,15 +67,15 @@
 
 /* ----------------------------------------------  */
 
-#banks-window {
+#deposits-window {
     display: none;
 }
 
-#banks-section {
+#deposits-section {
     margin-top: 20px;
 }
 
-#banks-section .create-bank-form {
+#deposits-section .create-deposit-form {
     display: none;
     padding: 20px;
     border: 1px solid #ccc;
@@ -83,8 +83,8 @@
     background-color: #f9f9f9;
 }
 
-#banks-section .create-bank-form input[type="text"],
-#banks-section .create-bank-form input[type="number"] {
+#deposits-section .create-deposit-form input[type="text"],
+#deposits-section .create-deposit-form input[type="number"] {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
@@ -92,7 +92,7 @@
     border-radius: 5px;
 }
 
-#banks-section .create-bank-form .create-bank-btn {
+#deposits-section .create-deposit-form .create-deposit-btn {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -101,11 +101,11 @@
     cursor: pointer;
 }
 
-#banks-section .create-bank-form .create-bank-btn:hover {
+#deposits-section .create-deposit-form .create-deposit-btn:hover {
     background-color: #0069d9;
 }
 
-#banks-section .create-bank-form .cancel-btn {
+#deposits-section .create-deposit-form .cancel-btn {
     padding: 10px 20px;
     background-color: #dc3545;
     color: white;
@@ -115,11 +115,11 @@
     margin-left: 10px;
 }
 
-#banks-section .create-bank-form .cancel-btn:hover {
+#deposits-section .create-deposit-form .cancel-btn:hover {
     background-color: #c82333;
 }
 
-#banks-section .toggle-bank-form-btn {
+#deposits-section .toggle-deposit-form-btn {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -128,8 +128,25 @@
     cursor: pointer;
 }
 
-#banks-section .toggle-bank-form-btn:hover {
+#deposits-section .toggle-deposit-form-btn:hover {
     background-color: #007bff;
 }
+
+#deposit-details {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#deposit-details h2 {
+    margin-top: 0;
+}
+
+#deposit-details p {
+    margin-bottom: 5px;
+}
+
 
 

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@DiscriminatorValue("deposit_history")
+@DiscriminatorValue("deposit_actions")
 public class DepositActions extends FinancialOperation {
 
     private BigDecimal userBalanceBeforeOperation;

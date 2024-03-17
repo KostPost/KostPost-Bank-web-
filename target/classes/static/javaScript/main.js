@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const buttons = document.querySelectorAll('.custom-btn');
     const windows = {
         'transfer-btn': document.getElementById('transfer-window'),
-        'banks-btn': document.getElementById('banks-window'),
+        'deposits-btn': document.getElementById('deposits-window'),
         'currency-btn': document.getElementById('currency-window'),
     };
     let lastOpenedWindow = null;
@@ -61,9 +61,43 @@ document.getElementById('card-number').addEventListener('input', function (e) {
     }
     e.target.value = formattedInput; // Обновляем значение поля ввода
 });
+document.getElementById("transfer-form").addEventListener("submit", function(e) {
+    e.preventDefault();
 
+    // Создание объекта FormData из формы
+    const formData = new FormData(this);
+
+    // Добавляем правильное имя поля для идентификатора, если необходимо
+    const identifierType = formData.get("identifierType");
+    let identifier = formData.get("identifier");
+    if (identifierType === "username") {
+        formData.set("username", identifier); // предполагаем, что сервер ожидает поле с именем "username"
+    } else {
+        formData.set("cardNumber", identifier); // предполагаем, что сервер ожидает поле с именем "cardNumber"
+    }
+    formData.delete("identifier"); // Удаление исходного поля "identifier", если необходимо
+
+    fetch('/transfer', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if(data.success === "true") {
+                showNotification("Транзакция успешно выполнена");
+            } else {
+                document.getElementById("error-message").textContent = data.message;
+                document.getElementById("error-message").style.display = "block";
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            showNotification("Ошибка при выполнении транзакции");
+        });
+});
 
 function displayOperationDetails(operationId) {
+    console.log('Displaying details for operation ID:', operationId);
     // Remove the 'active' class from all entries
     document.querySelectorAll('.operation-entry').forEach(entry => {
         entry.classList.remove('active');
@@ -93,7 +127,7 @@ function displayOperationDetails(operationId) {
                 <p>Amount: ${data.amount ? `${data.amount} $` : 'N/A'}</p>
                 <p>Comment: ${data.comment || 'N/A'}</p>
             `;
-            } else if(data.transactionType === 'RECEIVED'){
+            } else if (data.transactionType === 'RECEIVED') {
                 detailsHTML += `
                 <p>Type: Transaction (Received)</p>
                 <p>Sender: ${data.sender || 'N/A'}</p> <!-- Updated from 'Recipient' to 'Sender' -->
@@ -152,12 +186,20 @@ function formatCardNumber(input) {
     input.value = cardNumber;
 }
 
-function showCreateBankForm() {
-    document.getElementById('create-bank-section').style.display = 'block';
-    document.getElementById('banks-list').style.display = 'none';
+function showCreateDepositForm() {
+    const createDepositSection = document.getElementById("create-deposit-section");
+    if (createDepositSection.style.display === "none") {
+        createDepositSection.style.display = "block";
+    }
 }
 
-function hideCreateBankForm() {
-    document.getElementById('create-bank-section').style.display = 'none';
-    document.getElementById('banks-list').style.display = 'block';
+
+function hideCreateDepositForm() {
+    document.getElementById('create-deposit-section').style.display = 'none';
+    document.getElementById('deposits-list').style.display = 'block';
 }
+
+
+
+
+

@@ -30,18 +30,16 @@
             });
         });
     });
-
-
     document.addEventListener('DOMContentLoaded', function () {
-        var createBankBtn = document.querySelector('.create-bank-btn');
+        var createBankBtn = document.querySelector('.create-deposit-btn');
 
         createBankBtn.addEventListener('click', function () {
-            var bankName = document.getElementById("bank-name").value;
-            var bankAmount = document.getElementById("bank-amount").value;
+            var depositName = document.getElementById("deposit-name").value;
+            var depositGoalAmount = document.getElementById("deposit-amount").value;
 
             var data = new FormData();
-            data.append('deposit-name', bankName);
-            data.append('deposit-amount', bankAmount);
+            data.append('deposit-name', depositName);
+            data.append('deposit-amount', depositGoalAmount);
 
             fetch('/createDeposit', {
                 method: 'POST',
@@ -62,6 +60,34 @@
                 });
         });
     });
+
+    function showDepositDetails(depositID) {
+        const depositDetails = document.getElementById("deposit-details");
+        if (depositDetails.style.display === 'block') {
+            depositDetails.style.display = 'none';
+        }
+        const selectedEntry = document.querySelector(`[data-id="${depositID}"]`);
+        if (selectedEntry) {
+            selectedEntry.classList.add('active');
+        }
+        fetch(`/deposits/${depositID}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("deposit-name-detail").innerText = data.depositName;
+                document.getElementById("deposit-current-amount").innerText = "Текущая сумма: " + data.depositCurrentAmount;
+                document.getElementById("deposit-goal-amount").innerText = "Цель депозита: " + data.depositGoalAmount;
+                depositDetails.style.display = "block";
+            })
+            .catch(error => {
+                console.error('Ошибка при выполнении запроса:', error);
+            });
+    }
+
+    function showCreateDepositForm() {
+        document.getElementById("create-deposit-section").style.display = "block";
+    }
+
+
 </script>
 
 <body>
@@ -79,7 +105,7 @@
 
 <div class="buttons-container">
     <button id="transfer-btn" class="custom-btn">Перевод</button>
-    <button id="banks-btn" class="custom-btn">Накопление</button>
+    <button id="deposits-btn" class="custom-btn">Накопление</button>
     <button id="currency-btn" class="custom-btn">Валюты</button>
 </div>
 
@@ -107,30 +133,47 @@
     <div id="success-message" style="color: green; display: none;"></div>
 </div>
 
-
-<div id="banks-window" class="menu-window">
-    <!-- Секция для отображения существующих банок -->
-    <div id="banks-list">
-        <h2>Список банок</h2>
+<!--<li th:each="operation : ${moneyHistory}" th:data-id="${operation.operationId}" class="operation-entry"-->
+<!--    style="cursor: pointer;" onclick="displayOperationDetails(this.getAttribute('data-id'))">-->
+<!-- Измененный HTML-код -->
+<div id="deposits-window" class="menu-window">
+    <!-- Секция для отображения существующих депозитов -->
+    <div id="deposits-list">
+        <h2>Список депозитов</h2>
+        <!-- Список депозитов с добавленным стилем для указания курсора -->
         <ul>
-            <!-- Thymeleaf цикл для отображения каждой банки -->
-            <li th:each="deposit : ${deposits}">
-                <span th:text="${deposit.depositName}">Название банки</span>
+            <!-- Thymeleaf цикл для отображения каждого депозита -->
+            <li th:each="deposit : ${deposits}" th:data-id="${deposit.depositID}" class="operation-entry"
+                onclick="showDepositDetails(this.getAttribute('data-id'))"
+                style="cursor: pointer;">
+
+                <span th:text="${deposit.depositName}">Название депозита</span>
                 -
-                <span th:text="${deposit.depositGoalSum}">Сумма</span>
+                <span th:text="${deposit.depositCurrentAmount}">Текущая сумма</span>
+                /
+                <span th:text="${deposit.depositGoalAmount}">Цель депозита</span>
             </li>
         </ul>
-        <button type="button" onclick="showCreateBankForm()">Создать банку</button>
+
+        <button type="button" onclick="showCreateDepositForm()">Создать депозит</button>
     </div>
 
-    <!-- Скрытая форма для создания банки -->
-    <div id="create-bank-section" style="display:none;">
-        <form id="create-bank-form">
-            <input type="text" id="bank-name" placeholder="Название банки">
-            <input type="number" id="bank-amount" placeholder="Сумма">
-            <button type="button" class="create-bank-btn">Создать банку</button>
-            <button type="button" class="cancel-btn" onclick="hideCreateBankForm()">Отмена</button>
+    <!-- Скрытая форма для создания депозита -->
+    <div id="create-deposit-section" style="display:none;">
+        <form id="create-deposit-form">
+            <input type="text" id="deposit-name" placeholder="Название депозита">
+            <input type="number" id="deposit-amount" placeholder="Сумма">
+            <button type="button" class="create-deposit-btn">Создать депозит</button>
+            <button type="button" class="cancel-btn" onclick="hideCreateDepositForm()">Отмена</button>
         </form>
+    </div>
+
+    <!-- Окно с подробностями депозита (изначально скрыто) -->
+    <div id="deposit-details" style="display:none;">
+        <h2 id="deposit-name-detail">Название депозита</h2>
+        <p id="deposit-current-amount">Текущая сумма: </p>
+        <p id="deposit-goal-amount">Цель депозита: </p>
+        <!-- Дополнительные действия с депозитом могут быть добавлены здесь -->
     </div>
 </div>
 
@@ -143,8 +186,6 @@
         <ul>
             <li th:each="operation : ${moneyHistory}" th:data-id="${operation.operationId}" class="operation-entry"
                 style="cursor: pointer;" onclick="displayOperationDetails(this.getAttribute('data-id'))">
-
-
                 <!-- Handling SEND operation -->
                 <span th:if="${operation.transactionType != null and operation.transactionType.name() == 'SEND'}">
                     <span th:text="'To: ' + ${operation.recipient} + ' | Amount: '"></span>

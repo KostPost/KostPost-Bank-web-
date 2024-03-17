@@ -3,9 +3,10 @@ package org.web.webauthorization.Services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web.webauthorization.BankData.FinancialOperation.Deposit;
-import org.web.webauthorization.BankData.Accounts.UserAccount;
 import org.web.webauthorization.BankDataRepository.FinancialOperation.DepositRepository;
 import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
+
+import java.util.Optional;
 
 @Service
 public class DepositService {
@@ -24,10 +25,9 @@ public class DepositService {
         this.transactionService = transactionService;
     }
 
-    public void withdrawMoney(UserAccount ownerDeposit, Deposit deposit){
+    public Optional<Deposit> getDepositById(Long depositID) {
 
-
-
+        return depositRepository.findById(depositID);
     }
 
 }

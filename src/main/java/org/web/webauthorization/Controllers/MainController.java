@@ -18,10 +18,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.ui.Model;
-//import org.web.webauthorization.BankDataRepository.financialOperationRepository;
 import org.web.webauthorization.BankDataRepository.FinancialOperation.FinancialOperationRepository;
 import org.web.webauthorization.BankDataRepository.FinancialOperation.TransactionRepository;
 import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
+import org.web.webauthorization.Services.DepositService;
 import org.web.webauthorization.Services.UserAccountService;
 
 import static org.web.webauthorization.BankData.FinancialOperation.FinancialOperation.DepositActions.WITHDRAW;
@@ -34,19 +34,33 @@ public class MainController {
     private final UserAccountService userAccountService;
     private final TransactionRepository transactionRepository;
     private final FinancialOperationRepository financialOperationRepository;
+    private final DepositService depositService;
 
     UserAccount mainUser = null;
 
     @Autowired
     public MainController(UserAccountRepository userAccountRepository, TransactionRepository transactionRepository,
                           UserAccountService userAccountService, DepositRepository depositRepository,
-                          FinancialOperationRepository financialOperationRepository) {
+                          FinancialOperationRepository financialOperationRepository, DepositService depositService) {
         this.userAccountRepository = userAccountRepository;
         this.transactionRepository = transactionRepository;
         this.userAccountService = userAccountService;
         this.depositRepository = depositRepository;
         this.financialOperationRepository = financialOperationRepository;
+        this.depositService = depositService;
     }
+
+    @GetMapping("/deposits/{depositID}")
+    @ResponseBody
+    public Optional<Deposit> getDeposit(@PathVariable Long depositID) {
+        System.out.println("zxc");
+        Optional<Deposit> depositOptional = depositRepository.findById(depositID);
+        System.out.println(depositOptional.get().getDepositID());
+        System.out.println("zxc");
+
+        return Optional.of(depositOptional.orElse(null));
+    }
+
 
     @GetMapping("/operation-details/{operationId}")
     @ResponseBody
@@ -61,6 +75,9 @@ public class MainController {
         if (operationOptional.isPresent()) {
             FinancialOperation operation = operationOptional.get();
             FinancialOperationDTO dto = new FinancialOperationDTO();
+
+
+            System.out.println("qwe");
 
             // Populate DTO fields from the operation entity
             dto.setOperationId(operation.getOperationId());
@@ -251,11 +268,11 @@ public class MainController {
 
         Deposit deposit = new Deposit();
         deposit.setDepositName(depositName);
-        deposit.setDepositGoalSum(depositSum);
+        deposit.setDepositGoalAmount(depositSum);
         deposit.setOwnerID(mainUser.getId());
 
 
-        System.out.println(STR."\{deposit.getDepositID()}\n\{deposit.getOwnerID()}\n\{deposit.getDepositGoalSum()}\n\{deposit.getDepositName()}");
+        System.out.println(STR."\{deposit.getDepositID()}\n\{deposit.getOwnerID()}\n\{deposit.getDepositGoalAmount()}\n\{deposit.getDepositName()}");
 
         depositRepository.save(deposit);
 
