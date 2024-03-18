@@ -12,6 +12,9 @@
     border-radius: 8px; /* Скругление углов */
     z-index: 100; /* Убедитесь, что окно будет поверх других элементов */
     text-align: center; /* Выравнивание текста по центру */
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 /* Стиль для текста внутри окон */
@@ -131,13 +134,21 @@
 #deposits-section .toggle-deposit-form-btn:hover {
     background-color: #007bff;
 }
-
+/* Стили для окна подробностей депозита */
 #deposit-details {
-    display: none;
-    padding: 20px;
+    width: 100%; /* Увеличили ширину в 2 раза */
+    height: 400%; /* Увеличили высоту в 3 раза */
+    overflow-y: auto; /* Добавили вертикальную прокрутку */
+    padding: 40px; /* Увеличили внутренний отступ */
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999; /* Убедитесь, что окно будет поверх других элементов */
+    display: none;
 }
 
 #deposit-details h2 {
@@ -149,4 +160,62 @@
 }
 
 
+.custom-btn {
+    margin-right: 10px;
+}
+/* Стили для кнопки "Назад" */
+.back-btn {
+    margin-top: 10px;
+    width: 80px;
+    height: 30px;
+    font-size: 14px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
 
+
+
+#deposit-details button.custom-btn {
+    width: auto; /* Автоматический размер кнопки */
+    height: auto; /* Автоматическая высота кнопки */
+    padding: 5px 10px; /* Уменьшенный внутренний отступ */
+    font-size: 12px; /* Уменьшенный размер шрифта */
+    margin: 5px; /* Уменьшенные отступы между кнопками */
+}
+.modal {
+    display: none; /* Скрыть модальное окно по умолчанию */
+    position: fixed; /* Положение фиксированное */
+    z-index: 1000; /* Отображать поверх других элементов */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Добавить прокрутку, если содержимое окна превышает высоту экрана */
+    background-color: rgba(0, 0, 0, 0.4); /* Цвет фона с затемнением */
+}
+
+/* Стили для содержимого модального окна */
+.modal-content {
+    background-color: #fefefe; /* Цвет фона */
+    margin: 15% auto; /* Отступ сверху и снизу, абсолютно по центру по горизонтали */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%; /* Ширина окна */
+    position: relative; /* Относительное позиционирование */
+}
+
+/* Стили для кнопки закрытия */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

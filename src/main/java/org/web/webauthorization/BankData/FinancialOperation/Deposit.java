@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Data
-@Table(name = "deposit")
+@Table(name = "deposits")
 public class Deposit {
 
     @Id
@@ -22,7 +22,7 @@ public class Deposit {
     private String depositName;
 
     @Column(name = "deposit_current_sum")
-    private BigDecimal depositCurrentAmount =  BigDecimal.valueOf(100);
+    private BigDecimal depositCurrentAmount =  BigDecimal.valueOf(0);
 
     @Column(name = "deposit_goal_sum")
     private BigDecimal depositGoalAmount;

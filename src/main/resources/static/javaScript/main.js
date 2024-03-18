@@ -150,7 +150,14 @@ function displayOperationDetails(operationId) {
                 <p>Balance Before: ${data.userBalanceBeforeOperation ? `${data.userBalanceBeforeOperation} $` : 'N/A'}</p>
                 <p>Balance After: ${data.userBalanceAfterOperation ? `${data.userBalanceAfterOperation} $` : 'N/A'}</p>
             `;
-            } else {
+            } else if (data.depositActions === 'DELETE') {
+                detailsHTML += `
+                <p>Type: From deleted deposit</p>
+                <p>Amount: ${data.amount ? `${data.amount} $` : 'N/A'}</p>
+                <p>Balance Before: ${data.userBalanceBeforeOperation ? `${data.userBalanceBeforeOperation} $` : 'N/A'}</p>
+                <p>Balance After: ${data.userBalanceAfterOperation ? `${data.userBalanceAfterOperation} $` : 'N/A'}</p>
+            `;
+            } else{
                 // If the operation type or deposit action is undefined or not recognized
                 detailsHTML += `<p>Type: ${data.transactionType || data.depositActions || 'N/A'}</p>`;
             }
@@ -186,20 +193,129 @@ function formatCardNumber(input) {
     input.value = cardNumber;
 }
 
-function showCreateDepositForm() {
-    const createDepositSection = document.getElementById("create-deposit-section");
-    if (createDepositSection.style.display === "none") {
-        createDepositSection.style.display = "block";
-    }
+function showDepositsList() {
+    const depositsList = document.getElementById("deposits-list");
+    const depositDetails = document.getElementById("deposit-details");
+
+    // Показать список депозитов и скрыть подробности депозита
+    depositsList.style.display = "block";
+    depositDetails.style.display = "none";
 }
 
+function showCreateDepositForm() {
+    // Скрыть список депозитов и скрыть подробности депозита (если они открыты)
+    const depositsList = document.getElementById("deposits-list");
+    const depositDetails = document.getElementById("deposit-details");
+    depositsList.style.display = "none";
+    depositDetails.style.display = "none";
+
+    // Показать форму создания депозита
+    const createDepositSection = document.getElementById("create-deposit-section");
+    createDepositSection.style.display = "block";
+}
 
 function hideCreateDepositForm() {
-    document.getElementById('create-deposit-section').style.display = 'none';
-    document.getElementById('deposits-list').style.display = 'block';
+    document.getElementById("create-deposit-section").style.display = "none";
+    document.getElementById("deposits-list").style.display = "block"; // Показываем окно списка депозитов
 }
 
 
+function showDepositDetails(depositID) {
+    const depositsList = document.getElementById("deposits-list");
+    const depositDetails = document.getElementById("deposit-details");
+    const depositNameDetail = document.getElementById("deposit-name-detail");
+    const depositCurrentAmount = document.getElementById("deposit-current-amount");
+    const depositGoalAmount = document.getElementById("deposit-goal-amount");
+
+    document.getElementById("deposit-id").value = depositID;
+
+    if (depositDetails.style.display === 'block') {
+        depositDetails.style.display = 'none';
+    }
+    const selectedEntry = document.querySelector(`[data-id="${depositID}"]`);
+    if (selectedEntry) {
+        selectedEntry.classList.add('active');
+    }
+    fetch(`/deposits/${depositID}`)
+        .then(response => response.json())
+        .then(data => {
+            depositNameDetail.innerText = data.depositName;
+            depositCurrentAmount.innerText = "Текущая сумма: " + data.depositCurrentAmount;
+            depositGoalAmount.innerText = "Цель депозита: " + data.depositGoalAmount;
+
+            // Скрыть список депозитов и показать подробности депозита
+            depositsList.style.display = "none";
+            depositDetails.style.display = "block";
+        })
+        .catch(error => {
+            console.error('Ошибка при выполнении запроса:', error);
+        });
+}
 
 
+function depositAction(actionType) {
+    const depositId = document.getElementById("deposit-id").value;
+    const amount = prompt("Введите сумму для операции:");
+
+    if (!amount) {
+        alert("Операция отменена или введена некорректная сумма.");
+        return;
+    }
+
+    fetch('/depositAction', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `deposit-id=${depositId}&deposit-amount-action=${amount}&deposit-actions-type=${actionType}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.success === "true") {
+                // Обновить информацию о депозите, если необходимо
+                showDepositDetails(depositId);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при выполнении операции:', error);
+        });
+}
+
+
+function deleteDeposit() {
+    // Получаем ID депозита из скрытого поля в форме
+    var depositId = document.getElementById('deposit-id').value;
+
+    // Показываем диалог подтверждения
+    if (confirm('Вы уверены, что хотите удалить этот депозит?')) {
+        // Если пользователь подтвердил удаление, отправляем POST запрос на сервер
+        fetch('/deleteDeposit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'deposit-id=' + depositId
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Обработка ответа от сервера
+                if (data.success === "true") {
+                    alert(data.message); // Показываем сообщение об успехе
+                    // Дополнительно: можно обновить страницу или скрыть детали депозита
+                    // document.getElementById('deposit-details').style.display = 'none';
+                    // или
+                    // location.reload();
+                } else {
+                    // Обработка ошибки, если data.success не равно "true"
+                    alert("Произошла ошибка при удалении депозита.");
+                }
+            })
+            .catch(error => {
+                // Обработка ошибки сети
+                console.error('Ошибка при отправке запроса: ', error);
+                alert("Ошибка при отправке запроса на сервер.");
+            });
+    }
+}
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.web.webauthorization.BankData.FinancialOperation.*;
 import org.web.webauthorization.BankData.Accounts.UserAccount;
+import org.web.webauthorization.BankDataRepository.FinancialOperation.DepositActionsRepository;
 import org.web.webauthorization.BankDataRepository.FinancialOperation.DepositRepository;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepositor
 import org.web.webauthorization.Services.DepositService;
 import org.web.webauthorization.Services.UserAccountService;
 
+import static org.web.webauthorization.BankData.FinancialOperation.FinancialOperation.DepositActions.DEPOSIT;
 import static org.web.webauthorization.BankData.FinancialOperation.FinancialOperation.DepositActions.WITHDRAW;
 
 @Controller
@@ -35,29 +37,33 @@ public class MainController {
     private final TransactionRepository transactionRepository;
     private final FinancialOperationRepository financialOperationRepository;
     private final DepositService depositService;
+    private final DepositActionsRepository depositActionsRepository;
 
     UserAccount mainUser = null;
 
     @Autowired
     public MainController(UserAccountRepository userAccountRepository, TransactionRepository transactionRepository,
                           UserAccountService userAccountService, DepositRepository depositRepository,
-                          FinancialOperationRepository financialOperationRepository, DepositService depositService) {
+                          FinancialOperationRepository financialOperationRepository, DepositService depositService,
+                          DepositActionsRepository depositActionsRepository) {
         this.userAccountRepository = userAccountRepository;
         this.transactionRepository = transactionRepository;
         this.userAccountService = userAccountService;
         this.depositRepository = depositRepository;
         this.financialOperationRepository = financialOperationRepository;
         this.depositService = depositService;
+        this.depositActionsRepository = depositActionsRepository;
     }
 
     @GetMapping("/deposits/{depositID}")
     @ResponseBody
     public Optional<Deposit> getDeposit(@PathVariable Long depositID) {
-        System.out.println("zxc");
         Optional<Deposit> depositOptional = depositRepository.findById(depositID);
-        System.out.println(depositOptional.get().getDepositID());
-        System.out.println("zxc");
 
+
+        System.out.println(mainUser.getAccountName());
+
+        assert depositOptional.orElse(null) != null;
         return Optional.of(depositOptional.orElse(null));
     }
 
@@ -75,9 +81,6 @@ public class MainController {
         if (operationOptional.isPresent()) {
             FinancialOperation operation = operationOptional.get();
             FinancialOperationDTO dto = new FinancialOperationDTO();
-
-
-            System.out.println("qwe");
 
             // Populate DTO fields from the operation entity
             dto.setOperationId(operation.getOperationId());
@@ -177,8 +180,10 @@ public class MainController {
 
                     if (operation.getDepositActions() == WITHDRAW) {
                         dto.setDepositActions(FinancialOperation.DepositActions.WITHDRAW);
-                    } else {
+                    } else  if (operation.getDepositActions() == DEPOSIT) {
                         dto.setDepositActions(FinancialOperation.DepositActions.DEPOSIT);
+                    } else {
+                        dto.setDepositActions(FinancialOperation.DepositActions.DELETE);
                     }
                     dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());
                     dto.setUserBalanceAfterOperation(depositHistory.getUserBalanceAfterOperation());
@@ -253,7 +258,6 @@ public class MainController {
     @ResponseBody
     public ResponseEntity<Map<String, String>> createDeposit(@RequestParam("deposit-name") String depositName,
                                                              @RequestParam("deposit-amount") BigDecimal depositSum) {
-
         Map<String, String> response = new HashMap<>();
         String error = null;
 
@@ -281,4 +285,59 @@ public class MainController {
         return ResponseEntity.ok().body(response);
     }
 
+    @PostMapping("/depositAction")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> handleDepositActionMoney(@RequestParam("deposit-id") Long depositId,
+                                                                        @RequestParam("deposit-amount-action") BigDecimal depositAmount,
+                                                                        @RequestParam("deposit-actions-type") String depositActionType) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            // Проверка, является ли пользователь владельцем депозита или есть ли у него права на выполнение операции
+            Deposit deposit = depositRepository.findById(depositId)
+                    .orElseThrow(() -> new IllegalArgumentException("Deposit not found with id: " + depositId));
+
+            if (!deposit.getOwnerID().equals(mainUser.getId())) {
+                throw new IllegalAccessException("User does not have permission to modify this deposit.");
+            }
+
+            if ("WITHDRAW".equals(depositActionType)) {
+                if (deposit.getDepositCurrentAmount().compareTo(depositAmount) < 0) {
+                    throw new IllegalArgumentException("Insufficient funds on deposit to withdraw.");
+                }
+                depositService.handleDepositActionMoney(depositId, depositAmount, mainUser, "WITHDRAW");
+            } else if ("DEPOSIT".equals(depositActionType)) {
+                if (mainUser.getAccountBalance().compareTo(depositAmount) < 0) {
+                    throw new IllegalArgumentException("Insufficient funds in user account to deposit.");
+                }
+                depositService.handleDepositActionMoney(depositId, depositAmount, mainUser, "DEPOSIT");
+            } else {
+                throw new IllegalArgumentException("Invalid deposit action type.");
+            }
+
+            response.put("success", "true");
+            response.put("message", "Transaction successful");
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            response.put("success", "false");
+            response.put("message", e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            response.put("success", "false");
+            response.put("message", "An error occurred while processing the request.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/deleteDeposit")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteDeposit(@RequestParam("deposit-id") Long depositId){
+        Map<String, String> response = new HashMap<>();
+        DepositService depositService = new DepositService(depositRepository, userAccountRepository, depositActionsRepository);
+
+        depositService.deleteDeposit(depositId, mainUser);
+
+        response.put("success", "true");
+        response.put("message", "Transaction successful");
+        return ResponseEntity.ok().body(response);
+    }
 }

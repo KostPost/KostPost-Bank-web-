@@ -32,12 +32,14 @@ public abstract class FinancialOperation {
     @Column(name = "operation_creator_id")
     private Long operationCreatorId;
 
-    @Transient
+    @Enumerated(EnumType.STRING)
+    @Column(name = "deposit_action")
     public DepositActions depositActions;
     @Getter
     public enum DepositActions {
         WITHDRAW("Withdraw"),
-        DEPOSIT("Deposit");
+        DEPOSIT("Deposit"),
+        DELETE("Delete");
 
         private final String description;
         DepositActions(String description) {
