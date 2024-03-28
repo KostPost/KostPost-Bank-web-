@@ -59,11 +59,11 @@
     justify-content: space-around; /* Распределяет квадраты равномерно внутри контейнера */
     padding: 20px; /* Добавляет отступ внутри .content */
     position: absolute;
-    top: 150px;
+    top: 220px;
 }
 .history {
     margin-left: 400px;
-    width: 300px;
+    width: 400px;
     height: 500px;
     background-color: white;
     border: 2px solid black;

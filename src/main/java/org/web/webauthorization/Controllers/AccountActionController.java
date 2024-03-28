@@ -8,18 +8,22 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.web.webauthorization.BankData.Accounts.Accounts;
 import org.web.webauthorization.BankData.Accounts.UserAccount;
 import org.web.webauthorization.BankDataRepository.Accounts.AccountRepository;
+import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 
 @Controller
 public class AccountActionController {
 
-    @Autowired
     private final AccountRepository accountRepository;
 
+    private final UserAccountRepository userAccountRepository;
+
     @Autowired
-    public AccountActionController(AccountRepository accountRepository) {
+    public AccountActionController(AccountRepository accountRepository, UserAccountRepository userAccountRepository) {
         this.accountRepository = accountRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @GetMapping("/")
@@ -46,19 +50,20 @@ public class AccountActionController {
             @RequestParam(name = "password") String password,
             Model model) {
 
-        UserAccount isExist = accountRepository.findByAccountName(username);
+        UserAccount isExist = userAccountRepository.findByAccountName(username);
 
         if(isExist == null){
             UserAccount newAccount = new UserAccount();
             newAccount.setAccountName(username);
             newAccount.setAccountPassword(password);
 
-            //isExist = new UserAccount();
             do {
                 newAccount.setCardNumber(UserAccount.generateCardNumber());
                 isExist = accountRepository.findByCardNumber(newAccount.getCardNumber());
 
             } while (isExist != null);
+
+            newAccount.setAccountRole(Accounts.AccountRole.USER);
 
             accountRepository.save(newAccount);
         } else {

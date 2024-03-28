@@ -8,8 +8,10 @@ import org.web.webauthorization.BankData.Accounts.UserAccount;
 @Repository
 public interface AccountRepository extends CrudRepository<Accounts, Long> {
 
-    UserAccount findByAccountName(String accountName);
+
 
     UserAccount findByCardNumber(String cardNumber);
+
+    Accounts findByAccountName(String cardNumber);
 
 }

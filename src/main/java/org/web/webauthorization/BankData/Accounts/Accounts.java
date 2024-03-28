@@ -2,7 +2,9 @@ package org.web.webauthorization.BankData.Accounts;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
+import org.web.webauthorization.BankData.FinancialOperation.FinancialOperation;
 
 import java.util.UUID;
 
@@ -24,6 +26,18 @@ public abstract class Accounts {
     private String accountPassword;
 
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_role")
+    public AccountRole accountRole;
 
+    @Getter
+    public enum AccountRole {
+        ADMIN("Admin"),
+        USER("User");
 
+        private final String description;
+        AccountRole(String description) {
+            this.description = description;
+        }
+    }
 }

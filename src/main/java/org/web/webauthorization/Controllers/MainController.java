@@ -105,8 +105,10 @@ public class MainController {
 
                 if (operation.getDepositActions() == WITHDRAW) {
                     dto.setDepositActions(FinancialOperation.DepositActions.WITHDRAW);
-                } else {
+                } else  if (operation.getDepositActions() == DEPOSIT) {
                     dto.setDepositActions(FinancialOperation.DepositActions.DEPOSIT);
+                } else {
+                    dto.setDepositActions(FinancialOperation.DepositActions.DELETE);
                 }
                 // Set DepositHistory-specific fields
                 dto.setUserBalanceBeforeOperation(depositHistory.getUserBalanceBeforeOperation());

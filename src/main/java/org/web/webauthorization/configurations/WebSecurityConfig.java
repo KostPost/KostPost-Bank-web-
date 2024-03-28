@@ -12,10 +12,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.web.webauthorization.BankData.Accounts.Accounts;
 import org.web.webauthorization.BankData.Accounts.UserAccount;
 import org.web.webauthorization.BankDataRepository.Accounts.AccountRepository;
+import org.web.webauthorization.BankDataRepository.Accounts.UserAccountRepository;
 
 
 @Configuration
@@ -24,6 +27,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private UserAccountRepository userAccountRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -62,16 +68,24 @@ public class WebSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
-            UserAccount account = accountRepository.findByAccountName(username);
+            UserAccount account = userAccountRepository.findByAccountName(username);
             if (account == null) {
                 throw new UsernameNotFoundException("Could not find user with username: " + username);
             }
 
-            return User.withUsername(username)
-                    .passwordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder()::encode)
-                    .password(account.getAccountPassword())
-                    .roles("USER")
-                    .build();
+            if (account.getAccountRole() == Accounts.AccountRole.USER) {
+                return User.withUsername(username)
+                        .passwordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder()::encode)
+                        .password(account.getAccountPassword())
+                        .roles("USER")
+                        .build();
+            } else {
+                return User.withUsername(username)
+                        .passwordEncoder(PasswordEncoderFactories.createDelegatingPasswordEncoder()::encode)
+                        .password(account.getAccountPassword())
+                        .roles("ADMIN")
+                        .build();
+            }
         };
     }
 

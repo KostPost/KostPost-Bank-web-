@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="ca8bdbbe-b006-41c3-a1f3-e6d57d51771d" name="defaultdb@kostpost-14140.8nj.gcp-europe-west1.cockroachlabs.cloud Mapping">
+      <data-sources db="2a055e9b-641e-4786-b660-b2d3183b4a07" />
+      <scope>
+        <node kind="database" negative="1" />
+      </scope>
+    </mapping>
+  </component>
+</project>

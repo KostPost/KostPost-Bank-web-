@@ -143,16 +143,16 @@ function displayOperationDetails(operationId) {
                 <p>Balance Before: ${data.userBalanceBeforeOperation ? `${data.userBalanceBeforeOperation} $` : 'N/A'}</p>
                 <p>Balance After: ${data.userBalanceAfterOperation ? `${data.userBalanceAfterOperation} $` : 'N/A'}</p>
             `;
-            } else if (data.depositActions === 'DEPOSIT') {
+            }  else if (data.depositActions === 'DELETE') {
                 detailsHTML += `
-                <p>Type: Deposit</p>
+                <p>Type: From deleted deposit</p>
                 <p>Amount: ${data.amount ? `${data.amount} $` : 'N/A'}</p>
                 <p>Balance Before: ${data.userBalanceBeforeOperation ? `${data.userBalanceBeforeOperation} $` : 'N/A'}</p>
                 <p>Balance After: ${data.userBalanceAfterOperation ? `${data.userBalanceAfterOperation} $` : 'N/A'}</p>
             `;
-            } else if (data.depositActions === 'DELETE') {
+            }else if (data.depositActions === 'DEPOSIT') {
                 detailsHTML += `
-                <p>Type: From deleted deposit</p>
+                <p>Type: Deposit</p>
                 <p>Amount: ${data.amount ? `${data.amount} $` : 'N/A'}</p>
                 <p>Balance Before: ${data.userBalanceBeforeOperation ? `${data.userBalanceBeforeOperation} $` : 'N/A'}</p>
                 <p>Balance After: ${data.userBalanceAfterOperation ? `${data.userBalanceAfterOperation} $` : 'N/A'}</p>
